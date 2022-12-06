@@ -1,0 +1,37 @@
+version: "3"
+services:
+  app:
+    dockerfile: ./Dockerfile
+    container_name: open-web-analytics
+    depends_on:
+      - db
+    networks:
+      - owa_net
+    environment:
+      - TIME_ZONE="Europe/Moscow" # Default value UTC
+    ports:
+      - 8080:80
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+  db:
+    image: mysql:5.7
+    volumes:
+      - ./mysql:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+    networks:
+      - owa_net
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+networks:
+  owa_net:
+    driver: bridge
