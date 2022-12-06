@@ -1,69 +1,44 @@
-FROM alpine:3.8
+FROM trafex/alpine-nginx-php7:latest
 LABEL Maintainer="Aires David <david.airespimentel@gmail.com>" \
       Description="Docker image for Open Web Analytics with Nginx & PHP-FPM 5.x based on Alpine Linux."
 
+USER root
 ARG OWA_VERSION
+ENV OWA_VERSION 1.7.7
 
-ENV OWA_UID="82" \
-    OWA_USER="www-data" \
-    OWA_GID="82" \
-    OWA_GROUP="www-data" \
-    WEBROOT_DIR=/var/www/html
+# ENV for OWA
+ENV OWA_DB_TYPE        "mysql"
+ENV OWA_DB_HOST        "db:3306"
+ENV OWA_DB_NAME        "owadb"
+ENV OWA_DB_USER        "owauser"
+ENV OWA_DB_PASSWORD    "owapassword"
+ENV OWA_PUBLIC_URL     "http://localhost:8000/"
+ENV OWA_NONCE_KEY      "owanoncekey"
+ENV OWA_NONCE_SALT     "owanoncesalt"
+ENV OWA_AUTH_KEY       "owaauthkey"
+ENV OWA_AUTH_SALT      "owaauthsalt"
+ENV OWA_ERROR_HANDLER  "development"
+ENV OWA_LOG_PHP_ERRORS "false"
+ENV OWA_CACHE_OBJECTS  "true"
 
-# Add OWA configuration
-ADD config /tmp/owa-config
+RUN apk --no-cache add php7-zip php7-simplexml php7-imap php7-mbstring curl && \
+	rm /var/www/html/* && \
+	wget https://github.com/Open-Web-Analytics/Open-Web-Analytics/releases/download/${OWA_VERSION}/owa_${OWA_VERSION}_packaged.tar	-O /owa.tar && \
+	mkdir -p /var/lib/php/session && \
+	mkdir -p /var/www/html/webserver-configs && \
+	mkdir -p /var/www/owa && \
+	tar xf /owa.tar --directory /var/www/owa && \
+	rm /owa.tar && \
+    ln -s /var/www/html/webserver-configs/owa-nginx.conf /etc/nginx/conf.d/owa-nginx.conf
+ADD config/owa-nginx.conf /var/www/owa/webserver-configs/owa-nginx.conf
+ADD config/owa-nginx.conf /var/www/html/webserver-configs/owa-nginx.conf
+ADD config/startup.sh /startup.sh
+RUN chmod a+rx /startup.sh && \
+	chown nobody:nobody /startup.sh && \
+	chown -R nobody:nobody /var/www/owa && \
+	chown -R nobody:nobody /var/www/html && \
+	chown -R nobody:nobody /var/lib/php/session
 
-# Add application user and group
-RUN set -ex \
-	&& addgroup -g $OWA_UID -S $OWA_GROUP \
-	&& adduser -u $OWA_GID -D -S -G $OWA_USER $OWA_GROUP \
-# Install packages
-    && apk update \
-    && apk upgrade \
-    && apk add --update tzdata \
-    && apk --no-cache add \
-    php5-fpm \    
-    php5-mysql \
-    php5-mysqli \
-    php5-pcntl \
-    php5-json \
-    php5-openssl \
-    php5-curl \
-    php5-zlib \
-    php5-xml \
-    php5-phar \
-    php5-intl \
-    php5-dom \
-    php5-xmlreader \
-    php5-ctype \
-    php5-gd \
-    nginx supervisor curl jq \
-# Setup OWA configuration
-    && cp /tmp/owa-config/nginx.conf /etc/nginx/nginx.conf \
-    && cp /tmp/owa-config/owa-www.conf /etc/php5/fpm.d/ \
-    && cp /tmp/owa-config/owa.ini /etc/php5/conf.d/ \
-    && mkdir -p /etc/supervisor/conf.d \
-    && cp /tmp/owa-config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf \
-    && cp /tmp/owa-config/entrypoint.sh /usr/bin/owa-entrypoint.sh \
-    && chmod 0775 /usr/bin/owa-entrypoint.sh \
-# Setup php-fpm unix user/group
-    && sed -i "s|user\s*=.*|user = ${OWA_USER}|g" /etc/php5/php-fpm.conf \
-    && sed -i "s|group\s*=.*|group = ${OWA_GROUP}|g" /etc/php5/php-fpm.conf \
-# Add Open Web Analytics (OWA)
-    && mkdir -p $WEBROOT_DIR \
-    && if [ "x$OWA_VERSION" = "x" ] | [ "$OWA_VERSION" = "latest" ] ; then \
-    OWA_VERSION=$(curl -L -s -H 'Accept: application/json' https://api.github.com/repos/padams/Open-Web-Analytics/releases/latest| jq '.tag_name'| tr -d \") ; \
-    fi \
-    && echo "Install Open Web Analytics (OWA) version $OWA_VERSION" \
-    && curl -fsSL -o /tmp/owa.tar.gz "https://github.com/padams/Open-Web-Analytics/archive/$OWA_VERSION.tar.gz" \
-    && tar -xzf /tmp/owa.tar.gz -C /tmp \
-    && mv /tmp/Open-Web-Analytics-$OWA_VERSION/* $WEBROOT_DIR \
-    && chown -R $OWA_USER:$OWA_GROUP $WEBROOT_DIR/ \
-    && chmod -R 0775 $WEBROOT_DIR/ \
-    && apk del jq \
-    && rm -rf /var/cache/apk/* /tmp/owa.tar.gz /tmp/owa-config 
-
-WORKDIR $WEBROOT_DIR
-EXPOSE 80 443
-ENTRYPOINT ["/usr/bin/owa-entrypoint.sh"]
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+USER nobody
+EXPOSE 8000
+CMD [ "/startup.sh" ]
