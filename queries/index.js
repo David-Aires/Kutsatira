@@ -27,3 +27,4 @@ export * from './analytics/session/getSessions';
 export * from './analytics/stats/getActiveVisitors';
 export * from './analytics/stats/getRealtimeData';
 export * from './analytics/stats/getWebsiteStats';
+export * from './analytics/event/updateScreenshot';

@@ -49,6 +49,7 @@ CREATE TABLE `pageview` (
     `session_id` INTEGER UNSIGNED NOT NULL,
     `created_at` TIMESTAMP(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
     `url` VARCHAR(500) NOT NULL,
+    `from` VARCHAR(500) NOT NULL,
     `referrer` VARCHAR(500) NULL,
 
     INDEX `pageview_created_at_idx`(`created_at`),
@@ -81,6 +82,18 @@ CREATE TABLE `session` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE "subpages" (
+    "subpage_id" INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+    "website_id" INTEGER UNSIGNED NOT NULL,
+    "url" VARCHAR(500) NOT NULL,
+    "screenshot" BLOB DEFAULT NULL,
+    INDEX `subpages_website_id_idx`(`website_id`),
+    INDEX `subpages_website_id_url_idx`(`website_id`, `url`),
+    PRIMARY KEY (`subpage_id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+
+-- CreateTable
 CREATE TABLE `website` (
     `website_id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
     `website_uuid` VARCHAR(36) NOT NULL,
@@ -96,6 +109,9 @@ CREATE TABLE `website` (
     INDEX `website_website_uuid_idx`(`website_uuid`),
     PRIMARY KEY (`website_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+
+ALTER TABLE subpages ADD CONSTRAINT `subpages_screenshot_unique` UNIQUE KEY(`website_id`,`url`);
 
 -- CreateAdminUser
 INSERT INTO account (username, password, is_admin, account_uuid) values ('admin', '$2b$10$BUli0c.muyCW1ErNJc3jL.vFRFtFJWrT8/GcR4A.sUdCznaXiqFXa', true, uuid());

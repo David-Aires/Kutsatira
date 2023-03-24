@@ -8,6 +8,7 @@ import OverflowText from 'components/common/OverflowText';
 import PageHeader from 'components/layout/PageHeader';
 import Modal from 'components/common/Modal';
 import WebsiteEditForm from 'components/forms/WebsiteEditForm';
+import WebsiteScreenshotForm from 'components/forms/ScreenshotForms';
 import ResetForm from 'components/forms/ResetForm';
 import DeleteForm from 'components/forms/DeleteForm';
 import TrackingCodeForm from 'components/forms/TrackingCodeForm';
@@ -22,6 +23,7 @@ import Reset from 'assets/redo.svg';
 import Plus from 'assets/plus.svg';
 import Code from 'assets/code.svg';
 import LinkIcon from 'assets/link.svg';
+import Screenshot from 'assets/screenshot.svg'
 import useFetch from 'hooks/useFetch';
 import useUser from 'hooks/useUser';
 import styles from './WebsiteSettings.module.css';
@@ -29,6 +31,7 @@ import styles from './WebsiteSettings.module.css';
 export default function WebsiteSettings() {
   const { user } = useUser();
   const [editWebsite, setEditWebsite] = useState();
+  const [screenshotWebsite, setScreenshotWebsite] = useState();
   const [resetWebsite, setResetWebsite] = useState();
   const [deleteWebsite, setDeleteWebsite] = useState();
   const [addWebsite, setAddWebsite] = useState();
@@ -65,6 +68,13 @@ export default function WebsiteSettings() {
         tooltip={<FormattedMessage id="label.edit" defaultMessage="Edit" />}
         tooltipId={`button-edit-${row.websiteUuid}`}
         onClick={() => setEditWebsite(row)}
+      />
+      <Button
+        icon={<Screenshot />}
+        size="small"
+        tooltip={<FormattedMessage id="label.screenshot" defaultMessage="Screenshot" />}
+        tooltipId={`button-screenshot-${row.websiteUuid}`}
+        onClick={() => setScreenshotWebsite(row)}
       />
       <Button
         icon={<Reset />}
@@ -150,6 +160,7 @@ export default function WebsiteSettings() {
   }
 
   function handleClose() {
+    setScreenshotWebsite(null);
     setAddWebsite(null);
     setEditWebsite(null);
     setResetWebsite(null);
@@ -188,6 +199,11 @@ export default function WebsiteSettings() {
         </Button>
       </PageHeader>
       <Table columns={user.isAdmin ? adminColumns : columns} rows={data} empty={empty} />
+      {screenshotWebsite && (
+        <Modal title={<FormattedMessage id="label.screenshot-website" defaultMessage="Screenshot website" />}>
+          <WebsiteScreenshotForm values={screenshotWebsite} onSave={handleSave} onClose={handleClose} />
+        </Modal>
+      )}
       {editWebsite && (
         <Modal title={<FormattedMessage id="label.edit-website" defaultMessage="Edit website" />}>
           <WebsiteEditForm values={editWebsite} onSave={handleSave} onClose={handleClose} />

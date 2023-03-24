@@ -20,6 +20,17 @@ model account {
   @@index([accountUuid])
 }
 
+model subpages {
+  id          Int       @id @default(autoincrement()) @map("subpage_id") @db.UnsignedInt
+  websiteId   Int       @map("website_id") @db.UnsignedInt
+  url         String    @db.VarChar(500)
+  screenshot  Bytes     @db.Blob
+  website     website   @relation(fields: [websiteId], references: [id])
+
+  @@index([websiteId, url])
+  @@index([websiteId])
+}
+
 model event {
   id        Int        @id @default(autoincrement()) @map("event_id") @db.UnsignedInt
   websiteId Int        @map("website_id") @db.UnsignedInt
@@ -98,6 +109,7 @@ model website {
   event       event[]
   pageview    pageview[]
   session     session[]
+  subpages    subpages[]
 
   @@index([userId])
   @@index([websiteUuid])

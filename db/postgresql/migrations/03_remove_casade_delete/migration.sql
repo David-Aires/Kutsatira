@@ -16,6 +16,9 @@ ALTER TABLE "session" DROP CONSTRAINT IF EXISTS "session_website_id_fkey";
 -- DropForeignKey
 ALTER TABLE "website" DROP CONSTRAINT IF EXISTS "website_user_id_fkey";
 
+-- DropForeignKey
+ALTER TABLE "subpages" DROP CONSTRAINT IF EXISTS "subpages_website_id_fkey";
+
 -- AddForeignKey
 ALTER TABLE "event" ADD CONSTRAINT "event_session_id_fkey" FOREIGN KEY ("session_id") REFERENCES "session"("session_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -33,3 +36,6 @@ ALTER TABLE "session" ADD CONSTRAINT "session_website_id_fkey" FOREIGN KEY ("web
 
 -- AddForeignKey
 ALTER TABLE "website" ADD CONSTRAINT "website_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "account"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "subpages" ADD CONSTRAINT "subpages_website_id_fkey" FOREIGN KEY ("website_id") REFERENCES "website"("website_id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -11,6 +11,16 @@ CREATE TABLE "account" (
 );
 
 -- CreateTable
+CREATE TABLE "subpages" (
+    "subpage_id" SERIAL NOT NULL,
+    "website_id" INTEGER NOT NULL,
+    "url" VARCHAR(500) NOT NULL,
+    "screenshot" bytea DEFAULT NULL,
+
+    PRIMARY KEY ("subpage_id")
+);
+
+-- CreateTable
 CREATE TABLE "event" (
     "event_id" SERIAL NOT NULL,
     "website_id" INTEGER NOT NULL,
@@ -30,7 +40,7 @@ CREATE TABLE "pageview" (
     "session_id" INTEGER NOT NULL,
     "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
     "url" VARCHAR(500) NOT NULL,
-    "from" VARCHAR(500),
+    "from" VARCHAR(500) NOT NULL,
     "referrer" VARCHAR(500),
 
     PRIMARY KEY ("view_id")
@@ -82,10 +92,16 @@ CREATE INDEX "event_website_id_idx" ON "event"("website_id");
 CREATE INDEX "pageview_created_at_idx" ON "pageview"("created_at");
 
 -- CreateIndex
+CREATE INDEX "subpages_created_at_idx" ON "subpages"("subpage_id");
+
+-- CreateIndex
 CREATE INDEX "pageview_session_id_idx" ON "pageview"("session_id");
 
 -- CreateIndex
 CREATE INDEX "pageview_website_id_created_at_idx" ON "pageview"("website_id", "created_at");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "subpages_website_id_url_idx" ON "subpages"("website_id", "url");
 
 -- CreateIndex
 CREATE INDEX "pageview_website_id_idx" ON "pageview"("website_id");
@@ -111,6 +127,9 @@ CREATE UNIQUE INDEX "website.share_id_unique" ON "website"("share_id");
 -- CreateIndex
 CREATE INDEX "website_user_id_idx" ON "website"("user_id");
 
+-- CreateIndex
+ALTER TABLE "subpages" ADD CONSTRAINT "subpages_screenshot_unique" UNIQUE USING INDEX "subpages_website_id_url_idx";
+
 -- AddForeignKey
 ALTER TABLE "event" ADD FOREIGN KEY ("session_id") REFERENCES "session"("session_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -128,6 +147,10 @@ ALTER TABLE "session" ADD FOREIGN KEY ("website_id") REFERENCES "website"("websi
 
 -- AddForeignKey
 ALTER TABLE "website" ADD FOREIGN KEY ("user_id") REFERENCES "account"("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "subpages" ADD FOREIGN KEY ("website_id") REFERENCES "website"("website_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
 
 -- CreateAdminUser
 INSERT INTO account (username, password, is_admin) values ('admin', '$2b$10$BUli0c.muyCW1ErNJc3jL.vFRFtFJWrT8/GcR4A.sUdCznaXiqFXa', true);
