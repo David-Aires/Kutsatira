@@ -28,12 +28,16 @@ async function eventStoreQuery(
     entityId: eventUuid,
   };
 
+  if (eventData) {
+    data.additional = eventData;
+  }
+
   const event = jsonEvent({
-    type: eventData.type,
+    type: 'event',
     data: data,
   });
 
-  eventstore.client.appendToStream(eventData.name, event);
+  eventstore.client.appendToStream(url + '_' + eventName, event);
 
   await eventstore.client.enableProjection('EventDB');
 

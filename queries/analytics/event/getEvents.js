@@ -37,6 +37,7 @@ function clickhouseQuery(websites, start_at) {
       event_name
     from event
     where event_name != ''
+      and position('void_'  in event_name) = 0
       and ${
         websites && websites.length > 0
           ? `website_id in (${getCommaSeparatedStringFormat(websites)})`

@@ -29,6 +29,7 @@ async function relationalQuery(
       join website 
         on event.website_id = website.website_id
     where website_uuid = $1${toUuid()}
+      and position('void_'  in event_name) = 0
       and event.created_at between $2 and $3
     ${getFilterQuery('event', filters, params)}
     group by 1, 2
@@ -55,6 +56,7 @@ async function clickhouseQuery(
       count(*) y
     from event
     where event_name != ''
+      and position('void_'  in event_name) = 0
       and website_id= $1
       and ${getBetweenDates('created_at', start_at, end_at)}
       ${getFilterQuery('event', filters, params)}

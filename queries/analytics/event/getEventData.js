@@ -39,6 +39,7 @@ async function relationalQuery(websiteId, { startDate, endDate, event_name, colu
       join event_data
         on event.event_id = event_data.event_id
     where website_uuid = $1${toUuid()}
+      and position('void_'  in event_name) = 0
       and event.created_at between $2 and $3
       ${event_name ? `and event_name = $4` : ''}
       ${filterQuery}`,
@@ -61,7 +62,8 @@ async function clickhouseQuery(websiteId, { startDate, endDate, event_name, colu
     `select
       ${getEventDataColumnsQuery('event_data', columns)}
     from event
-    where website_id= $1
+    where position('void_'  in event_name) = 0
+      and website_id= $1
       ${event_name ? `and event_name = ${event_name}` : ''}
       and ${getBetweenDates('created_at', startDate, endDate)}
       ${
