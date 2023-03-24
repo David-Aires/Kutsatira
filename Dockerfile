@@ -1,44 +1,55 @@
-FROM trafex/alpine-nginx-php7:latest
-LABEL Maintainer="Aires David <david.airespimentel@gmail.com>" \
-      Description="Docker image for Open Web Analytics with Nginx & PHP-FPM 5.x based on Alpine Linux."
+# Install dependencies only when needed
+FROM node:16-alpine AS deps
+# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
 
-USER root
-ARG OWA_VERSION
-ENV OWA_VERSION 1.7.7
+# Rebuild the source code only when needed
+FROM node:16-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
 
-# ENV for OWA
-ENV OWA_DB_TYPE        "mysql"
-ENV OWA_DB_HOST        "db:3306"
-ENV OWA_DB_NAME        "owadb"
-ENV OWA_DB_USER        "owauser"
-ENV OWA_DB_PASSWORD    "owapassword"
-ENV OWA_PUBLIC_URL     "http://localhost:8000/"
-ENV OWA_NONCE_KEY      "owanoncekey"
-ENV OWA_NONCE_SALT     "owanoncesalt"
-ENV OWA_AUTH_KEY       "owaauthkey"
-ENV OWA_AUTH_SALT      "owaauthsalt"
-ENV OWA_ERROR_HANDLER  "development"
-ENV OWA_LOG_PHP_ERRORS "false"
-ENV OWA_CACHE_OBJECTS  "true"
+ARG DATABASE_TYPE
+ARG BASE_PATH
 
-RUN apk --no-cache add php7-zip php7-simplexml php7-imap php7-mbstring curl && \
-	rm /var/www/html/* && \
-	wget https://github.com/Open-Web-Analytics/Open-Web-Analytics/releases/download/${OWA_VERSION}/owa_${OWA_VERSION}_packaged.tar	-O /owa.tar && \
-	mkdir -p /var/lib/php/session && \
-	mkdir -p /var/www/html/webserver-configs && \
-	mkdir -p /var/www/owa && \
-	tar xf /owa.tar --directory /var/www/owa && \
-	rm /owa.tar && \
-    ln -s /var/www/html/webserver-configs/owa-nginx.conf /etc/nginx/conf.d/owa-nginx.conf
-ADD config/owa-nginx.conf /var/www/owa/webserver-configs/owa-nginx.conf
-ADD config/owa-nginx.conf /var/www/html/webserver-configs/owa-nginx.conf
-ADD config/startup.sh /startup.sh
-RUN chmod a+rx /startup.sh && \
-	chown nobody:nobody /startup.sh && \
-	chown -R nobody:nobody /var/www/owa && \
-	chown -R nobody:nobody /var/www/html && \
-	chown -R nobody:nobody /var/lib/php/session
+ENV DATABASE_TYPE $DATABASE_TYPE
+ENV BASE_PATH $BASE_PATH
 
-USER nobody
-EXPOSE 8000
-CMD [ "/startup.sh" ]
+ENV NEXT_TELEMETRY_DISABLED 1
+
+RUN yarn build-docker
+
+# Production image, copy all the files and run next
+FROM node:16-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED 1
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+RUN yarn add npm-run-all dotenv prisma
+
+# You only need to copy next.config.js if you are NOT using the default configuration
+COPY --from=builder /app/next.config.js .
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/scripts ./scripts
+
+# Automatically leverage output traces to reduce image size
+# https://nextjs.org/docs/advanced-features/output-file-tracing
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+
+EXPOSE 3000
+
+ENV PORT 3000
+
+CMD ["yarn", "start-docker"]
