@@ -9,6 +9,8 @@ import PageHeader from 'components/layout/PageHeader';
 import { FormattedMessage } from 'react-intl';
 import ActiveUsers from './ActiveUsers';
 import styles from './WebsiteHeader.module.css';
+import Heatmap from 'assets/heatmap.svg';
+import Button from '../common/Button';
 
 export default function WebsiteHeader({ websiteId, title, domain, showLink = false }) {
   const header = showLink ? (
@@ -37,6 +39,20 @@ export default function WebsiteHeader({ websiteId, title, domain, showLink = fal
       </div>
       <div className="col-2 col-lg-4 order-2 order-lg-3">
         <ButtonLayout align="right">
+        {!showLink && (
+          <Button
+              tooltip={<FormattedMessage id="label.heatmap" defaultMessage="Heatmap" />}
+              tooltipId="button-heatmap"
+              size="small"
+            >
+              <Link
+                href="/heatmap/[...id]"
+                as={`/heatmap/${websiteId}/${title}`}
+                size="small"
+                icon={<Heatmap />}
+              />
+          </Button>
+          )}
           <RefreshButton websiteId={websiteId} />
           {showLink && (
             <Link

@@ -7,8 +7,8 @@ export default function useFetch(url, options = {}, update = []) {
   const [error, setError] = useState();
   const [loading, setLoading] = useState(false);
   const [count, setCount] = useState(0);
-  const { get } = useApi();
-  const { params = {}, headers = {}, disabled = false, delay = 0, interval, onDataLoad } = options;
+  const { get, getImage } = useApi();
+  const { params = {}, headers = {}, disabled = false, image=false, delay = 0, interval, onDataLoad } = options;
 
   async function loadData(params) {
     try {
@@ -16,7 +16,9 @@ export default function useFetch(url, options = {}, update = []) {
       setError(null);
       const time = performance.now();
 
-      const { data, status, ok } = await get(url, params, headers);
+
+      const { data, status, ok } = await (image?getImage(url, params, headers):get(url, params, headers));
+
 
       await saveQuery(url, { time: performance.now() - time, completed: Date.now() });
 

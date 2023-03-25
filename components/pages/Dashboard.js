@@ -10,6 +10,7 @@ import useDashboard from 'store/dashboard';
 import DashboardEdit from './DashboardEdit';
 import styles from './WebsiteList.module.css';
 
+
 const messages = defineMessages({
   dashboard: { id: 'label.dashboard', defaultMessage: 'Dashboard' },
   more: { id: 'label.more', defaultMessage: 'More' },
@@ -29,6 +30,8 @@ export default function Dashboard({ userId }) {
   if (!data) {
     return null;
   }
+
+  console.log(data)
 
   return (
     <Page>

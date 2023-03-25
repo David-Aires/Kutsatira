@@ -17,9 +17,6 @@ export default async (req, res) => {
     const { id: websiteId } = req.query;
     const { url, site } = req.body;
 
-    console.log(site)
-    console.log(url)
-
     const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']});
     const page = await browser.newPage();
     await page.goto(site);

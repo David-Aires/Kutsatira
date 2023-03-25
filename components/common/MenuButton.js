@@ -5,7 +5,6 @@ import Menu from 'components/common/Menu';
 import Button from 'components/common/Button';
 import useDocumentClick from 'hooks/useDocumentClick';
 import styles from './MenuButton.module.css';
-
 function MenuButton({
   icon,
   value,

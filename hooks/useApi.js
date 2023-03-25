@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { get, post, put, del, getItem } from 'next-basics';
 import { AUTH_TOKEN, SHARE_TOKEN_HEADER } from 'lib/constants';
 import useStore from 'store/app';
+import { getImage } from './useGetImage';
 
 const selector = state => state.shareToken;
 
@@ -24,6 +25,17 @@ export default function useApi() {
   const shareToken = useStore(selector);
 
   return {
+    getImage: useCallback(
+      async (url, params = {}, headers = {}) => {
+        return getImage(
+          `${basePath}/api${url}`,
+          params,
+          parseHeaders(headers, { authToken, shareToken }),
+        );
+      },
+      [getImage],
+    ),
+
     get: useCallback(
       async (url, params = {}, headers = {}) => {
         return get(
