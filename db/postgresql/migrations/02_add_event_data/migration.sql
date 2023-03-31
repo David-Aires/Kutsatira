@@ -18,6 +18,8 @@ CREATE TABLE "event" (
     "session_id" INTEGER NOT NULL,
     "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
     "url" VARCHAR(500) NOT NULL,
+    "step" VARCHAR(500) DEFAULT NULL,
+    "event_type" VARCHAR(50) NOT NULL,
     "event_name" VARCHAR(50) NOT NULL,
 
     PRIMARY KEY ("event_id")

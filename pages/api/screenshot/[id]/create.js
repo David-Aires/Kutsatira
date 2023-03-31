@@ -15,7 +15,7 @@ export default async (req, res) => {
     }
 
     const { id: websiteId } = req.query;
-    const { url, site } = req.body;
+    const { url, site, step } = req.body;
 
     const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']});
     const page = await browser.newPage();
@@ -24,7 +24,7 @@ export default async (req, res) => {
 
     await browser.close();
 
-    await updateScreenshot(websiteId, url, image)
+    await updateScreenshot(websiteId, url, step, image)
 
     return ok(res);
   }

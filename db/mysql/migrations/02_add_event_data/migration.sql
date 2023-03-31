@@ -21,6 +21,8 @@ CREATE TABLE `event`
     `session_id` INTEGER UNSIGNED NOT NULL,
     `created_at` TIMESTAMP(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
     `url` VARCHAR(500) NOT NULL,
+    `step` VARCHAR(500) DEFAULT NULL,
+    `event_name` VARCHAR(50) NOT NULL,
     `event_name` VARCHAR(50) NOT NULL,
 
     INDEX `event_created_at_idx`(`created_at`),

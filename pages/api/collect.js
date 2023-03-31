@@ -62,7 +62,7 @@ export default async (req, res) => {
 
   const { type, payload } = getJsonBody(req);
 
-  let { url, from, referrer, event_name: eventName, event_data: eventData } = payload;
+  let { url, from, referrer, event_name: eventName, event_type:eventType, event_data: eventData } = payload;
 
   if (process.env.REMOVE_TRAILING_SLASH) {
     url = url.replace(/\/$/, '');
@@ -78,6 +78,7 @@ export default async (req, res) => {
       eventUuid,
       url,
       eventName,
+      eventType,
       eventData,
     });
   } else {

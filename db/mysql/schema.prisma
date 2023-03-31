@@ -24,9 +24,11 @@ model subpages {
   id          Int       @id @default(autoincrement()) @map("subpage_id") @db.UnsignedInt
   websiteId   Int       @map("website_id") @db.UnsignedInt
   url         String    @db.VarChar(500)
+  step        String    @db.VarChar(500)
   screenshot  Bytes     @db.Blob
   website     website   @relation(fields: [websiteId], references: [id])
 
+  @@index([websiteId, url, step])
   @@index([websiteId, url])
   @@index([websiteId])
 }
@@ -37,7 +39,9 @@ model event {
   sessionId Int        @map("session_id") @db.UnsignedInt
   createdAt DateTime?  @default(now()) @map("created_at") @db.Timestamp(0)
   url       String     @db.VarChar(500)
+  step      String?    @db.VarChar(500)
   eventName String     @map("event_name") @db.VarChar(50)
+  eventType String     @map("event_type") @db.VarChar(50)
   eventUuid String     @unique() @map("event_uuid") @db.VarChar(36)
   session   session    @relation(fields: [sessionId], references: [id])
   website   website    @relation(fields: [websiteId], references: [id])

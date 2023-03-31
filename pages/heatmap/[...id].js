@@ -6,6 +6,7 @@ import useRequireLogin from 'hooks/useRequireLogin';
 import Page from 'components/layout/Page';
 import HeatmapBoard from 'components/pages/HeatmapBoard';
 
+
 export default function HeatmapPage() {
   const { loading } = useRequireLogin();
   const router = useRouter();
@@ -17,7 +18,9 @@ export default function HeatmapPage() {
 
   return (
     <Layout>
+      <Page>
         <HeatmapBoard id={id} />
+      </Page>
     </Layout>
   );
 }

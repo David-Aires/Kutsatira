@@ -5,8 +5,8 @@ import FilterButtons from 'components/common/FilterButtons';
 import { urlFilter } from 'lib/filters';
 import MetricsTable from './MetricsTable';
 import Link from 'components/common/Link';
-import OverflowText from 'components/common/OverflowText';
-import Favicon from 'components/common/Favicon';
+import Arrow from 'assets/arrow-right.svg';
+import { FormattedMessage } from 'react-intl';
 
 export const FILTER_COMBINED = 0;
 export const FILTER_RAW = 1;
@@ -42,9 +42,14 @@ export default function PagesTable({ websiteId, showFilters, ...props }) {
   return (
     <>
       {showFilters && <FilterButtons buttons={buttons} selected={filter} onClick={setFilter} />}
-      <Link href="/tree/[...id]" as={`/tree/${websiteId}/${title}`}>
-        <Favicon domain={props?.domain} />
-        <OverflowText tooltipId={`${websiteId}-name`}>{title}</OverflowText>
+      <Link 
+        href="/tree/[...id]" 
+        as={`/tree/${websiteId}/${title}`}
+        icon={<Arrow />}
+        size="small"
+        iconRight
+        >
+        <FormattedMessage id="label.view-tree" defaultMessage="View tree diagram" />
       </Link>
       <MetricsTable
         title={formatMessage(messages.pages)}

@@ -15,6 +15,7 @@ CREATE TABLE "subpages" (
     "subpage_id" SERIAL NOT NULL,
     "website_id" INTEGER NOT NULL,
     "url" VARCHAR(500) NOT NULL,
+    "step" VARCHAR(500) DEFAULT NULL,
     "screenshot" bytea DEFAULT NULL,
 
     PRIMARY KEY ("subpage_id")
@@ -27,6 +28,7 @@ CREATE TABLE "event" (
     "session_id" INTEGER NOT NULL,
     "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
     "url" VARCHAR(500) NOT NULL,
+    "step" VARCHAR(500) DEFAULT NULL,
     "event_type" VARCHAR(50) NOT NULL,
     "event_value" VARCHAR(50) NOT NULL,
 
@@ -104,6 +106,9 @@ CREATE INDEX "pageview_website_id_created_at_idx" ON "pageview"("website_id", "c
 CREATE UNIQUE INDEX "subpages_website_id_url_idx" ON "subpages"("website_id", "url");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "subpages_website_id_url_step_idx" ON "subpages"("website_id", "url", "step");
+
+-- CreateIndex
 CREATE INDEX "pageview_website_id_idx" ON "pageview"("website_id");
 
 -- CreateIndex
@@ -129,6 +134,9 @@ CREATE INDEX "website_user_id_idx" ON "website"("user_id");
 
 -- CreateIndex
 ALTER TABLE "subpages" ADD CONSTRAINT "subpages_screenshot_unique" UNIQUE USING INDEX "subpages_website_id_url_idx";
+
+-- CreateIndex
+ALTER TABLE "subpages" ADD CONSTRAINT "subpages_screenshot_unique_step" UNIQUE USING INDEX "subpages_website_id_url_step_idx";
 
 -- AddForeignKey
 ALTER TABLE "event" ADD FOREIGN KEY ("session_id") REFERENCES "session"("session_id") ON DELETE CASCADE ON UPDATE CASCADE;

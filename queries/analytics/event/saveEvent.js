@@ -18,19 +18,33 @@ function delay(time) {
 
 async function eventStoreQuery(
   { websiteId },
-  { session: { id: sessionId }, eventUuid, url, eventName, eventData },
+  { session: { id: sessionId }, eventUuid, url, eventName, eventType, eventData },
 ) {
+
   const data = {
     websiteId: websiteId,
     sessionId: sessionId,
     url: url?.substring(0, URL_LENGTH),
     eventName: eventName?.substring(0, EVENT_NAME_LENGTH),
+    eventType: eventType?.substring(0, EVENT_NAME_LENGTH),
     entityId: eventUuid,
   };
 
   if (eventData) {
     data.additional = eventData;
   }
+
+
+  if(data.eventName.includes(":")) {
+    const split_name = data.eventName.split(":")
+    data.eventName = split_name[1]
+    data.step = split_name[0]
+  }
+
+  if(data.eventName.includes("void_")) {
+    data.eventType = "void_"+data.eventType
+  }
+
 
   const event = jsonEvent({
     type: 'event',
@@ -54,8 +68,13 @@ async function relationalQuery(event) {
     sessionId: event.data.body.sessionId,
     url: event.data.body.url,
     eventName: event.data.body.eventName,
+    eventType: event.data.body.eventType,
     eventUuid: event.data.eventId,
   };
+
+  if(event.data.body.step) {
+    data.step = event.data.body.step
+  }
 
   if (event.data.body.additional) {
     data.eventData = {

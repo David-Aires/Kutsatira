@@ -31,8 +31,6 @@ export default function Dashboard({ userId }) {
     return null;
   }
 
-  console.log(data)
-
   return (
     <Page>
       <PageHeader>

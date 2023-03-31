@@ -8,30 +8,22 @@ import FormLayout, {
   FormMessage,
   FormRow,
 } from 'components/layout/FormLayout';
-import { URL_REGEX } from 'lib/constants';
 import useApi from 'hooks/useApi';
 import useFetch from 'hooks/useFetch';
 import styles from './WebsiteEditForm.module.css';
 
-const initialValues = {
-  site: ''
-};
+const initialValues = {}
 
-const validate = ({ site }) => {
-  const errors = {};
-  if (!site) {
-    errors.site = <FormattedMessage id="label.required" defaultMessage="Required" />;
-  } else if (!URL_REGEX.test(site)) {
-    errors.site = <FormattedMessage id="label.invalid-site" defaultMessage="Invalid site" />;
-  } 
-  return errors;
-};
 
 const PagesDropDown = ({ websites }) => {
     const { setFieldValue, values } = useFormikContext();
 
     useEffect(() => {
-            setFieldValue('url', values.url);
+        if(!values.url) {
+            setFieldValue('url', websites[0].x);
+        } else {
+            setFieldValue('url', values.url)
+        };
       }, [websites, setFieldValue , values]);
 
     return (
@@ -57,7 +49,11 @@ const StepsDropDown = ({ steps }) => {
   const { setFieldValue, values } = useFormikContext();
 
   useEffect(() => {
-          setFieldValue('step', values.step);
+    if(!values.step) {
+        setFieldValue('step', steps[0].step);
+    } else {
+        setFieldValue('step', values.step)
+    };
     }, [steps, setFieldValue , values]);
 
   return (
@@ -79,12 +75,42 @@ const StepsDropDown = ({ steps }) => {
   );
 };
 
-export default function WebsiteScreenshotForm({ values, onSave, onClose }) {
-  const { post, get } = useApi();
-  const { websiteUuid: websiteId } = values;
-  const [stepsValues, setStepsValues] = useState(false)
+const TypesDropDown = ({ types }) => {
+    const { setFieldValue, values } = useFormikContext();
+  
+    useEffect(() => {
+        if(!values.type) {
+            setFieldValue('type', types[0].event_type);
+        } else {
+            setFieldValue('type', values.type)
+        };
+      }, [types, setFieldValue , values]);
+  
+    return (
+      <FormRow>
+        <label htmlFor="type">
+          <FormattedMessage id="label.type" defaultMessage="type" />
+        </label>
+        <div>
+          <Field as="select" name="type" className={styles.dropdown}>
+            {types?.map(type => (
+              <option key={type.event_type} value={type.event_type}>
+                {type.event_type}
+              </option>
+            ))}
+          </Field>
+          <FormError name="type" />
+        </div>
+      </FormRow>
+    );
+  };
+
+export default function HeatmapForm({ values, onSave, onClose }) {
+  const { get } = useApi();
+  const [stepsValues, setStepsValues] = useState(null)
+  const [typesValues, setTypesValues] = useState(null)
   const { data: websites} = useFetch(
-    `/websites/${websiteId}/metrics`,
+    `/websites/${values}/metrics`,
     {
       params: {
         type: "url",
@@ -100,67 +126,63 @@ export default function WebsiteScreenshotForm({ values, onSave, onClose }) {
     return null;
   }
 
-  const onChangeStep = async eventForm => {
-    if(eventForm.target.tagName == 'SELECT' && eventForm.target.name == "url") {
-      const {ok, data:steps} = await get(`/websites/${websiteId}/steps`, {
-          url: eventForm.target.value
-      });
+  const updateForm = async url => {
+    const {data:steps} = await get(`/websites/${values}/steps`, {
+        url: url
+    });
 
-      if(steps.length > 0) { 
-        setStepsValues(steps);
-      } else {
-        setStepsValues(null);
-      }
+    const {data:types} = await get(`/websites/${values}/types`, {
+      url: url
+    });
+
+    if(steps.length > 0) { 
+      setStepsValues(steps);
+    } else {
+      setStepsValues(null);
+    }
+
+    if(types.length > 0) { 
+      setTypesValues(types);
+    } else {
+      setTypesValues(null);
+    }
+  }
+
+  const onChangeStep = eventForm => {
+    if(eventForm.target.tagName == 'SELECT' && eventForm.target.name == "url") {
+      updateForm(eventForm.target.value);
     }
   }
 
   const handleSubmit = async values => {
-    console.log(values)
-    const { ok, data } = await post(`/screenshot/${websiteId}/create`, {
-        url: values.url,
-        site: values.site,
-        step: (values.step && stepsValues?values.step:null)
-    });
-
-    if (ok) {
-      onSave();
+    if(!stepsValues) delete values.step;
+    if(values.url && ((values.step && stepsValues) || (!values.step && !stepsValues)) && values.type) {
+        onSave(values)
     } else {
-      setMessage(
-        data || <FormattedMessage id="message.failure" defaultMessage="Something went wrong." />,
-      );
+        setMessage(
+            <FormattedMessage id="message.failure" defaultMessage="Something went wrong." />,
+          );
     }
   };
+
+  if(!typesValues) {
+    updateForm(websites[0].x);
+  }
 
   return (
     <FormLayout>
       <Formik
-        initialValues={{ ...initialValues}}
-        validate={validate}
+      initialValues={initialValues}
         onSubmit={handleSubmit}
       >
         {() => (
           <Form onChange={onChangeStep}>
-            <FormRow>
-              <label htmlFor="site">
-                <FormattedMessage id="label.site" defaultMessage="URL" />
-              </label>
-              <div>
-                <Field
-                  name="site"
-                  type="text"
-                  placeholder="example.com"
-                  spellCheck="false"
-                  autoCapitalize="off"
-                  autoCorrect="off"
-                />
-                <FormError name="site" />
-              </div>
-            </FormRow>
             <PagesDropDown websites={websites}/>
             {stepsValues && <StepsDropDown steps={stepsValues}/>}
+            {typesValues && <TypesDropDown types={typesValues}/>}
             <FormButtons>
               <Button type="submit" variant="action">
-                <FormattedMessage id="label.createScreenshot" defaultMessage="Create" />
+                <FormattedMessage id="label.submit" defaultMessage="Submit" />
               </Button>
               <Button onClick={onClose}>
                 <FormattedMessage id="label.cancel" defaultMessage="Cancel" />
