@@ -1,26 +1,55 @@
 ---
 version: '3'
 services:
-  umami:
-    image: ghcr.io/umami-software/umami:postgresql-latest
+  kutsatira:
+    build: 
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: postgresql://umami:umami@db:5432/umami
+      DATABASE_URL: postgresql://kutsatira:kutsatira@db:5432/kutsatira
       DATABASE_TYPE: postgresql
+      EVENTSTORE_URL: esdb://eventstore:2113?tls=false
       HASH_SALT: replace-me-with-a-random-string
     depends_on:
       - db
+      - eventstore
     restart: always
+
   db:
     image: postgres:12-alpine
     environment:
-      POSTGRES_DB: umami
-      POSTGRES_USER: umami
-      POSTGRES_PASSWORD: umami
+      POSTGRES_DB: kutsatira
+      POSTGRES_USER: kutsatira
+      POSTGRES_PASSWORD: kutsatira
     volumes:
       - ./sql/schema.postgresql.sql:/docker-entrypoint-initdb.d/schema.postgresql.sql:ro
-      - umami-db-data:/var/lib/postgresql/data
+      - kutsatira-db-data:/var/lib/postgresql/data
     restart: always
+  
+  eventstore:
+    image: eventstore/eventstore:21.10.0-buster-slim
+    environment:
+      - EVENTSTORE_CLUSTER_SIZE=1
+      - EVENTSTORE_RUN_PROJECTIONS=All
+      - EVENTSTORE_START_STANDARD_PROJECTIONS=true
+      - EVENTSTORE_EXT_TCP_PORT=1113
+      - EVENTSTORE_HTTP_PORT=2113
+      - EVENTSTORE_INSECURE=true
+      - EVENTSTORE_ENABLE_EXTERNAL_TCP=true
+      - EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP=true
+    ports:
+      - "1113:1113"
+      - "2113:2113"
+    volumes:
+      - type: volume
+        source: eventstore-volume-data
+        target: /var/lib/eventstore
+      - type: volume
+        source: eventstore-volume-logs
+        target: /var/log/eventstore
 volumes:
   umami-db-data:
+  eventstore-volume-data:
+  eventstore-volume-logs:
