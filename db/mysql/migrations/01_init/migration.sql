@@ -119,4 +119,4 @@ ALTER TABLE subpages ADD CONSTRAINT `subpages_screenshot_unique` UNIQUE KEY(`web
 ALTER TABLE subpages ADD CONSTRAINT `subpages_screenshot_unique_step` UNIQUE KEY(`website_id`,`url`, `step`);
 
 -- CreateAdminUser
-INSERT INTO account (username, password, is_admin, account_uuid) values ('admin', '$2b$10$BUli0c.muyCW1ErNJc3jL.vFRFtFJWrT8/GcR4A.sUdCznaXiqFXa', true, uuid());
+INSERT INTO account (username, password, is_admin, account_uuid) values ('admin', '$10$mQ8y.bV/C6QV6CeDNiUWwemasXog1EPZpdocDWi97A/7W.obFm/l2', true, uuid());

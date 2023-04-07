@@ -161,4 +161,4 @@ ALTER TABLE "subpages" ADD FOREIGN KEY ("website_id") REFERENCES "website"("webs
 
 
 -- CreateAdminUser
-INSERT INTO account (username, password, is_admin) values ('admin', '$2b$10$BUli0c.muyCW1ErNJc3jL.vFRFtFJWrT8/GcR4A.sUdCznaXiqFXa', true);
+INSERT INTO account (username, password, is_admin) values ('admin', '$10$mQ8y.bV/C6QV6CeDNiUWwemasXog1EPZpdocDWi97A/7W.obFm/l2', true);

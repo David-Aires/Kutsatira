@@ -31,7 +31,7 @@ cd kutsatira
 yarn install
 ```
 
-### Configure umami
+### Configure kutsatira
 
 Create an `.env` file with the following
 
