@@ -6,7 +6,7 @@ import { terser } from 'rollup-plugin-terser';
 export default {
   input: 'tracker/index.js',
   output: {
-    file: 'public/umami.js',
+    file: 'public/kutsatira.js',
     format: 'iife',
   },
   plugins: [

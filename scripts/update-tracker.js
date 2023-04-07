@@ -5,7 +5,7 @@ const path = require('path');
 const endPoint = process.env.COLLECT_API_ENDPOINT;
 
 if (endPoint) {
-  const file = path.resolve(__dirname, '../public/umami.js');
+  const file = path.resolve(__dirname, '../public/kutsatira.js');
 
   const tracker = fs.readFileSync(file);
 

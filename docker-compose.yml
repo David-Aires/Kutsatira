@@ -50,6 +50,6 @@ services:
         source: eventstore-volume-logs
         target: /var/log/eventstore
 volumes:
-  umami-db-data:
+  kutsatira-db-data:
   eventstore-volume-data:
   eventstore-volume-logs:
