@@ -1,17 +1,21 @@
-# umami
+# kutsatira
 
-Umami is a simple, fast, privacy-focused alternative to Google Analytics.
+Kutsatira is a simple, fast, web analytics tool for configurator.
 
 ## Getting started
 
-A detailed getting started guide can be found at [https://umami.is/docs/](https://umami.is/docs/)
+A detailed getting started guide can be found at the original project [https://umami.is/docs/](https://umami.is/docs/)
+
+## SDK 
+
+Kutsatira has its own sdk for use with Angular. You can find more information on the github [https://github.com/Kutsatira/Kutsatira-SDK-Angular](https://github.com/Kutsatira/Kutsatira-SDK-Angular)
 
 ## Installing from source
 
 ### Requirements
 
 - A server with Node.js version 12 or newer
-- A database. Umami supports [MySQL](https://www.mysql.com/) and [Postgresql](https://www.postgresql.org/) databases.
+- A database. Kutsatira supports [MySQL](https://www.mysql.com/) and [Postgresql](https://www.postgresql.org/) databases.
 
 ### Install Yarn
 
@@ -22,8 +26,8 @@ npm install -g yarn
 ### Get the source code and install packages
 
 ```
-git clone https://github.com/umami-software/umami.git
-cd umami
+git clone https://github.com/David-Aires/Kutsatira.git
+cd kutsatira
 yarn install
 ```
 
@@ -33,6 +37,7 @@ Create an `.env` file with the following
 
 ```
 DATABASE_URL=connection-url
+EVENTSTORE_URL=connection-url
 ```
 
 The connection url is in the following format:
@@ -40,6 +45,8 @@ The connection url is in the following format:
 postgresql://username:mypassword@localhost:5432/mydb
 
 mysql://username:mypassword@localhost:3306/mydb
+
+esdb://localhost:2113?tls=false
 ```
 
 ### Build the application
@@ -48,7 +55,7 @@ mysql://username:mypassword@localhost:3306/mydb
 yarn build
 ```
 
-The build step will also create tables in your database if you ae installing for the first time. It will also create a login account with username **admin** and password **umami**.
+The build step will also create tables in your database if you ae installing for the first time. It will also create a login account with username **admin** and password **kutsatira**.
 
 ### Start the application
 
@@ -62,20 +69,10 @@ or change the [port](https://nextjs.org/docs/api-reference/cli#production) to se
 
 ## Installing with Docker
 
-To build the umami container and start up a Postgres database, run:
+To build the kutsatira container and start up a Postgres database, run:
 
 ```bash
 docker compose up
-```
-
-Alternatively, to pull just the Umami Docker image with PostgreSQL support:
-```bash
-docker pull docker.umami.dev/umami-software/umami:postgresql-latest
-```
-
-Or with MySQL support:
-```bash
-docker pull docker.umami.dev/umami-software/umami:mysql-latest
 ```
 
 ## Getting updates

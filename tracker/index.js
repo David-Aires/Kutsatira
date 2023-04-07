@@ -92,17 +92,18 @@
       .then(text => (cache = text));
   };
 
-  const trackView = (url = currentUrl, referrer = currentRef, websiteUuid = website) =>
+  const trackView = (url = currentUrl, from, referrer = currentRef, websiteUuid = website) =>
     collect(
       'pageview',
       assign(getPayload(), {
         website: websiteUuid,
         url,
+        from,
         referrer,
       }),
     );
 
-  const trackEvent = (eventName, eventData, url = currentUrl, websiteUuid = website) =>
+  const trackEvent = (eventName, eventType, eventData, url = currentUrl, websiteUuid = website) =>
     collect(
       'event',
       assign(getPayload(), {
@@ -110,6 +111,7 @@
         url,
         event_name: eventName,
         event_data: eventData,
+        event_type: eventType,
       }),
     );
 
@@ -191,12 +193,12 @@
 
   /* Global */
 
-  if (!window.umami) {
-    const umami = eventValue => trackEvent(eventValue);
-    umami.trackView = trackView;
-    umami.trackEvent = trackEvent;
+  if (!window.kutsatira) {
+    const kutsatira = eventValue => trackEvent(eventValue);
+    kutsatira.trackView = trackView;
+    kutsatira.trackEvent = trackEvent;
 
-    window.umami = umami;
+    window.kutsatira = kutsatira;
   }
 
   /* Start */
