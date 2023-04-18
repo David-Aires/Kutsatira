@@ -51,7 +51,7 @@ export default function HeatmapBoard({ id }) {
       });
 
       const unique = [];
-      if (points[0].event_data[0].posX) {
+      if (points[0].event_data[0]) {
         for (const element of points) {
           for (const point of element) {
             const item = point.event_data;

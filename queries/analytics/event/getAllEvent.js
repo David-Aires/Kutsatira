@@ -8,10 +8,12 @@ export async function getAllEvent(...args) {
 }
 
 async function relationalQuery(websiteId, url, type, step) {
-  const params = step ? [type, websiteId, url, step] : [type, websiteId, url];
+  const params = step == null ? [type, websiteId, url, step] : [type, websiteId, url];
   const { rawQuery, toUuid } = prisma;
 
-  const isStep = step ? 'and e.step = $4' : '';
+  const isStep = step == null ? 'and e.step = $4' : '';
+
+  console.log(isStep);
 
   return rawQuery(
     `select e.event_id , e.event_name , e.url, e.event_type , ed.event_data from event e

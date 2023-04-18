@@ -20,7 +20,6 @@ async function eventStoreQuery(
   { websiteId },
   { session: { id: sessionId }, eventUuid, url, eventName, eventType, eventData },
 ) {
-
   const data = {
     websiteId: websiteId,
     sessionId: sessionId,
@@ -34,17 +33,16 @@ async function eventStoreQuery(
     data.additional = eventData;
   }
 
-
-  if(data.eventName.includes(":")) {
-    const split_name = data.eventName.split(":")
-    data.eventName = split_name[1]
-    data.step = split_name[0]
+  if (url.startsWith('#')) data.url = data.url.substr(1, data.url.length - 1);
+  if (data.eventName.includes(':')) {
+    const split_name = data.eventName.split(':');
+    data.eventName = split_name[1];
+    data.step = split_name[0];
   }
 
-  if(data.eventName.includes("void_")) {
-    data.eventType = "void_"+data.eventType
+  if (data.eventName.includes('void_')) {
+    data.eventType = 'void_' + data.eventType;
   }
-
 
   const event = jsonEvent({
     type: 'event',
@@ -72,8 +70,8 @@ async function relationalQuery(event) {
     eventUuid: event.data.eventId,
   };
 
-  if(event.data.body.step) {
-    data.step = event.data.body.step
+  if (event.data.body.step) {
+    data.step = event.data.body.step;
   }
 
   if (event.data.body.additional) {
