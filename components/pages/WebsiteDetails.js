@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
 import WebsiteChart from 'components/metrics/WebsiteChart';
+import WebsiteChartConfig from 'components/metrics/WebsiteChartConfig';
 import WorldMap from 'components/common/WorldMap';
 import Page from 'components/layout/Page';
 import GridLayout, { GridRow, GridColumn } from 'components/layout/GridLayout';
@@ -141,6 +142,14 @@ export default function WebsiteDetails({ websiteId }) {
       <div className="row">
         <div className={classNames(styles.chart, 'col')}>
           <WebsiteChart
+            websiteId={websiteId}
+            title={data.name}
+            domain={data.domain}
+            onDataLoad={handleDataLoad}
+            showLink={false}
+            stickyHeader
+          />
+          <WebsiteChartConfig
             websiteId={websiteId}
             title={data.name}
             domain={data.domain}
