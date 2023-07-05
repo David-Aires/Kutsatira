@@ -19,6 +19,15 @@ ALTER TABLE "website" DROP CONSTRAINT IF EXISTS "website_user_id_fkey";
 -- DropForeignKey
 ALTER TABLE "subpages" DROP CONSTRAINT IF EXISTS "subpages_website_id_fkey";
 
+-- DropForeignKey
+ALTER TABLE "event" DROP CONSTRAINT IF EXISTS "event_configuration_uuid_fkey";
+
+-- DropForeignKey
+ALTER TABLE "configuration" DROP CONSTRAINT IF EXISTS "configuration_session_id_fkey";
+
+-- DropForeignKey
+ALTER TABLE "configuration" DROP CONSTRAINT IF EXISTS "configuration_website_id_fkey";
+
 -- AddForeignKey
 ALTER TABLE "event" ADD CONSTRAINT "event_session_id_fkey" FOREIGN KEY ("session_id") REFERENCES "session"("session_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
