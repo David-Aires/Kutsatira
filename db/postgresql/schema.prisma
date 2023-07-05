@@ -37,7 +37,7 @@ model event {
   id        Int        @id() @default(autoincrement()) @map("event_id")
   websiteId Int        @map("website_id")
   sessionId Int        @map("session_id")
-  configurationUuid String?  @map("configuration_Uuid") @db.VarChar(500)
+  configurationUuid String?  @map("configuration_uuid") @db.VarChar(500)
   createdAt DateTime?  @default(now()) @map("created_at") @db.Timestamptz(6)
   url       String     @db.VarChar(500)
   step      String?    @db.VarChar(500)
