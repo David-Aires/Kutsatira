@@ -22,7 +22,7 @@ async function eventStoreQuery(
     websiteId: websiteId,
     sessionId: sessionId,
     url: url?.substring(0, URL_LENGTH),
-    eventName: eventName?.substring(0, EVENT_NAME_LENGTH),
+    eventName: eventName,
     eventType: eventType?.substring(0, EVENT_NAME_LENGTH),
     entityId: eventUuid,
   };
