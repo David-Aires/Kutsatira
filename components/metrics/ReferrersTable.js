@@ -11,7 +11,7 @@ const FILTER_RAW = 1;
 const messages = defineMessages({
   combined: { id: 'metrics.filter.combined', defaultMessage: 'Combined' },
   raw: { id: 'metrics.filter.raw', defaultMessage: 'Raw' },
-  referrers: { id: 'metrics.referrers', defaultMessage: 'Referrers' },
+  referrers: { id: 'metrics.steps', defaultMessage: 'Steps' },
   views: { id: 'metrics.views', defaultMessage: 'Views' },
   none: { id: 'label.none', defaultMessage: 'None' },
 });
@@ -43,7 +43,7 @@ export default function ReferrersTable({ websiteId, showFilters, ...props }) {
       <MetricsTable
         {...props}
         title={formatMessage(messages.referrers)}
-        type="referrer"
+        type="step"
         metric={formatMessage(messages.views)}
         websiteId={websiteId}
         dataFilter={filter !== FILTER_RAW ? refFilter : null}

@@ -29,7 +29,6 @@ async function relationalQuery(websiteId, { startDate, endDate, column, table, f
       ${pageviewQuery}
       ${joinSession && sessionQuery}
       ${eventQuery}
-      ${table == 'event' ? "and position('void_'  in event_name) = 0" : ''}
     group by 1
     order by 2 desc`,
     params,
