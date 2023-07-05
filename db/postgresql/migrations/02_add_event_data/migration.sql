@@ -68,6 +68,9 @@ ALTER TABLE "event_data" ADD CONSTRAINT "event_data_event_id_fkey" FOREIGN KEY (
 ALTER INDEX IF EXISTS "account.username_unique" RENAME TO "account_username_key";
 
 -- RenameIndex
+ALTER INDEX IF EXISTS "configuration.uuid_unique" RENAME TO "configuration_uuid_key";
+
+-- RenameIndex
 ALTER INDEX IF EXISTS "session.session_uuid_unique" RENAME TO "session_session_uuid_key";
 
 -- RenameIndex

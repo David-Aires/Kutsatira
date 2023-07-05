@@ -104,6 +104,9 @@ CREATE INDEX "event_created_at_idx" ON "event"("created_at");
 CREATE INDEX "event_session_id_idx" ON "event"("session_id");
 
 -- CreateIndex
+CREATE INDEX "event_configuration_uuid_idx" ON "event"("configuration_uuid");
+
+-- CreateIndex
 CREATE INDEX "event_website_id_idx" ON "event"("website_id");
 
 -- CreateIndex
@@ -111,6 +114,9 @@ CREATE INDEX "pageview_created_at_idx" ON "pageview"("created_at");
 
 -- CreateIndex
 CREATE INDEX "configuration_created_at_idx" ON "configuration"("created_at");
+
+-- CreateIndex
+CREATE INDEX "configuration_configuration_id_idx" ON "configuration"("configuration_id");
 
 -- CreateIndex
 CREATE INDEX "subpages_created_at_idx" ON "subpages"("subpage_id");
