@@ -1,53 +1,38 @@
 import React, { useState } from 'react';
-import { useIntl, defineMessages } from 'react-intl';
-import MetricsTable from './MetricsTable';
-import FilterButtons from 'components/common/FilterButtons';
+import { useIntl, defineMessage } from 'react-intl';
 import FilterLink from 'components/common/FilterLink';
-import { refFilter } from 'lib/filters';
+import { urlFilter } from 'lib/filters';
+import MetricsTable from './MetricsTable';
+import { FormattedMessage } from 'react-intl';
 
-const FILTER_COMBINED = 0;
-const FILTER_RAW = 1;
+export const FILTER_COMBINED = 0;
+export const FILTER_RAW = 1;
 
-const messages = defineMessages({
-  combined: { id: 'metrics.filter.combined', defaultMessage: 'Combined' },
-  raw: { id: 'metrics.filter.raw', defaultMessage: 'Raw' },
-  referrers: { id: 'metrics.steps', defaultMessage: 'Steps' },
-  views: { id: 'metrics.views', defaultMessage: 'Views' },
-  none: { id: 'label.none', defaultMessage: 'None' },
+const messages = defineMessage({
+  pages: { id: 'metrics.steps', defaultMessage: 'Steps' },
+  views: { id: 'metrics.views', defaultMessage: 'View' },
 });
 
-export default function ReferrersTable({ websiteId, showFilters, ...props }) {
+export default function PagesTable({ websiteId, showFilters, ...props }) {
   const [filter, setFilter] = useState(FILTER_COMBINED);
   const { formatMessage } = useIntl();
-  const none = formatMessage(messages.none);
+  const url = document.URL;
+  const title = url.split('/')[5];
 
-  const buttons = [
-    {
-      label: formatMessage(messages.combined),
-      value: FILTER_COMBINED,
-    },
-    { label: formatMessage(messages.raw), value: FILTER_RAW },
-  ];
-
-  const renderLink = ({ w: link, x: referrer }) => {
-    return referrer ? (
-      <FilterLink id="referrer" value={referrer} externalUrl={link} />
-    ) : (
-      `(${none})`
-    );
+  const renderLink = ({ x: url }) => {
+    return <FilterLink id="url" value={url} />;
   };
 
   return (
     <>
-      {showFilters && <FilterButtons buttons={buttons} selected={filter} onClick={setFilter} />}
       <MetricsTable
-        {...props}
-        title={formatMessage(messages.referrers)}
+        title={formatMessage(messages.pages)}
         type="step"
         metric={formatMessage(messages.views)}
         websiteId={websiteId}
-        dataFilter={filter !== FILTER_RAW ? refFilter : null}
+        dataFilter={filter !== FILTER_RAW ? urlFilter : null}
         renderLabel={renderLink}
+        {...props}
       />
     </>
   );
