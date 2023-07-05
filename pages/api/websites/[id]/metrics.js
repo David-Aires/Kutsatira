@@ -5,10 +5,10 @@ import { badRequest, methodNotAllowed, ok, unauthorized } from 'next-basics';
 import { getPageviewMetrics, getSessionMetrics, getWebsite } from 'queries';
 
 const sessionColumns = ['browser', 'os', 'device', 'screen', 'country', 'language'];
-const pageviewColumns = ['url', 'referrer', 'query'];
+const pageviewColumns = ['url', 'referrer', 'query', 'step'];
 
 function getTable(type) {
-  if (type === 'event') {
+  if (type === 'event' || type == 'step') {
     return 'event';
   }
 
@@ -29,6 +29,9 @@ function getColumn(type) {
   }
   if (type === 'query') {
     return 'url';
+  }
+  if(type === 'step') {
+    return 'step'
   }
   return type;
 }
