@@ -32,7 +32,7 @@ async function eventStoreQuery(
   }
 
   if (url.startsWith('#')) data.url = data.url.substr(1, data.url.length - 1);
-  data.url.replace(REGEXCUT, '/[id]');
+  data.url = data.url.replace(REGEXCUT, '/[id]');
   if (data.eventName.includes(':')) {
     const split_name = data.eventName.split(':');
     data.configId = split_name[0];

@@ -28,9 +28,9 @@ async function eventStoreQuery({ websiteId }, { session: { id: sessionId }, url,
   if (url.startsWith('#')) data.url = data.url.substr(1, data.url.length - 1);
   if (from.startsWith('#')) data.from = data.from.substr(1, data.from.length - 1);
   if (referrer.startsWith('#')) data.referrer = data.referrer.substr(1, data.referrer.length - 1);
-  data.url.replace(REGEXCUT, '/[id]');
-  data.from.replace(REGEXCUT, '/[id]');
-  data.referrer.replace(REGEXCUT, '/[id]');
+  data.url = data.url.replace(REGEXCUT, '/[id]');
+  data.from = data.from.replace(REGEXCUT, '/[id]');
+  data.referrer = data.referrer.replace(REGEXCUT, '/[id]');
 
   const event = jsonEvent({
     type: 'pageView',

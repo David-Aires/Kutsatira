@@ -33,7 +33,7 @@ async function relationalQuery(
         count(${count !== '*' ? `${count}${sessionKey}` : count}) y
       from configuration
         join website
-            on pageview.website_id = website.website_id
+            on configuration.website_id = website.website_id
         ${joinSession}
       where website.website_uuid = $1${toUuid()}
         and configuration.created_at between $2 and $3
