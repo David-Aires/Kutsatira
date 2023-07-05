@@ -26,6 +26,7 @@ CREATE TABLE "event" (
     "event_id" SERIAL NOT NULL,
     "website_id" INTEGER NOT NULL,
     "session_id" INTEGER NOT NULL,
+    "configuration_uuid" VARCHAR(500) DEFAULT NULL,
     "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
     "url" VARCHAR(500) NOT NULL,
     "step" VARCHAR(500) DEFAULT NULL,
@@ -46,6 +47,18 @@ CREATE TABLE "pageview" (
     "referrer" VARCHAR(500),
 
     PRIMARY KEY ("view_id")
+);
+
+-- CreateTable
+CREATE TABLE "configuration" (
+    "configuration_id" SERIAL NOT NULL,
+    "website_id" INTEGER NOT NULL,
+    "session_id" INTEGER NOT NULL,
+    "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    "isComplete" BOOLEAN NOT NULL DEFAULT false,
+    "configuration_uuid" VARCHAR(500) NOT NULL,
+
+    PRIMARY KEY ("configuration_id")
 );
 
 -- CreateTable
@@ -82,6 +95,9 @@ CREATE TABLE "website" (
 CREATE UNIQUE INDEX "account.username_unique" ON "account"("username");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "configuration.uuid_unique" ON "configuration"("configuration_uuid");
+
+-- CreateIndex
 CREATE INDEX "event_created_at_idx" ON "event"("created_at");
 
 -- CreateIndex
@@ -94,13 +110,22 @@ CREATE INDEX "event_website_id_idx" ON "event"("website_id");
 CREATE INDEX "pageview_created_at_idx" ON "pageview"("created_at");
 
 -- CreateIndex
+CREATE INDEX "configuration_created_at_idx" ON "configuration"("created_at");
+
+-- CreateIndex
 CREATE INDEX "subpages_created_at_idx" ON "subpages"("subpage_id");
 
 -- CreateIndex
 CREATE INDEX "pageview_session_id_idx" ON "pageview"("session_id");
 
 -- CreateIndex
+CREATE INDEX "configuration_session_id_idx" ON "configuration"("session_id");
+
+-- CreateIndex
 CREATE INDEX "pageview_website_id_created_at_idx" ON "pageview"("website_id", "created_at");
+
+-- CreateIndex
+CREATE INDEX "configuration_website_id_created_at_idx" ON "configuration"("website_id", "created_at");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "subpages_website_id_url_idx" ON "subpages"("website_id", "url");
@@ -113,6 +138,12 @@ CREATE INDEX "pageview_website_id_idx" ON "pageview"("website_id");
 
 -- CreateIndex
 CREATE INDEX "pageview_website_id_session_id_created_at_idx" ON "pageview"("website_id", "session_id", "created_at");
+
+-- CreateIndex
+CREATE INDEX "configuration_website_id_idx" ON "configuration"("website_id");
+
+-- CreateIndex
+CREATE INDEX "configuration_website_id_session_id_created_at_idx" ON "configuration"("website_id", "session_id", "created_at");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "session.session_uuid_unique" ON "session"("session_uuid");
@@ -145,10 +176,19 @@ ALTER TABLE "event" ADD FOREIGN KEY ("session_id") REFERENCES "session"("session
 ALTER TABLE "event" ADD FOREIGN KEY ("website_id") REFERENCES "website"("website_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "event" ADD FOREIGN KEY ("configuration_uuid") REFERENCES "configuration"("configuration_uuid") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "pageview" ADD FOREIGN KEY ("session_id") REFERENCES "session"("session_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "pageview" ADD FOREIGN KEY ("website_id") REFERENCES "website"("website_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "configuration" ADD FOREIGN KEY ("website_id") REFERENCES "website"("website_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "configuration" ADD FOREIGN KEY ("session_id") REFERENCES "session"("session_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "session" ADD FOREIGN KEY ("website_id") REFERENCES "website"("website_id") ON DELETE CASCADE ON UPDATE CASCADE;

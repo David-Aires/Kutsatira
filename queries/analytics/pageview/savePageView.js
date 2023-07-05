@@ -1,4 +1,4 @@
-import { URL_LENGTH } from 'lib/constants';
+import { URL_LENGTH, REGEXCUT } from 'lib/constants';
 import { CLICKHOUSE, PRISMA, runQuery } from 'lib/db';
 import kafka from 'lib/kafka';
 import prisma from 'lib/prisma';
@@ -28,13 +28,18 @@ async function eventStoreQuery({ websiteId }, { session: { id: sessionId }, url,
   if (url.startsWith('#')) data.url = data.url.substr(1, data.url.length - 1);
   if (from.startsWith('#')) data.from = data.from.substr(1, data.from.length - 1);
   if (referrer.startsWith('#')) data.referrer = data.referrer.substr(1, data.referrer.length - 1);
+  data.url.replace(REGEXCUT, '/[id]');
+  data.from.replace(REGEXCUT, '/[id]');
+  data.referrer.replace(REGEXCUT, '/[id]');
 
   const event = jsonEvent({
     type: 'pageView',
     data: data,
   });
 
-  eventstore.client.appendToStream('pageView_' + data.url, event);
+  const currentdate = new Date();
+  const formatedDate = currentdate.getDate() + "/"+  (parseInt(currentdate.getMonth())    + 1)+ "/" + currentdate.getFullYear();
+  eventstore.client.appendToStream(websiteId + ':' + sessionId + '_' + formatedDate, event);
 
   await eventstore.client.enableProjection('EventDB');
 

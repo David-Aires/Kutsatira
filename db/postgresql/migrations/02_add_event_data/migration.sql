@@ -1,12 +1,14 @@
 -- DropForeignKey
 ALTER TABLE "event" DROP CONSTRAINT "event_session_id_fkey";
 ALTER TABLE "event" DROP CONSTRAINT "event_website_id_fkey";
+ALTER TABLE "event" DROP CONSTRAINT "event_configuration_uuid_fkey";
 
 -- RenameIndex
 ALTER INDEX "event_pkey" RENAME TO "event_old_pkey";
 ALTER INDEX "event_created_at_idx" RENAME TO "event_old_created_at_idx";
 ALTER INDEX "event_session_id_idx" RENAME TO "event_old_session_id_idx";
 ALTER INDEX "event_website_id_idx" RENAME TO "event_old_website_id_idx";
+ALTER INDEX "event_configuration_uuid_idx" RENAME TO "event_old_configuration_uuid_idx";
 
 -- RenameTable
 ALTER TABLE "event" RENAME TO "_event_old";
@@ -16,6 +18,7 @@ CREATE TABLE "event" (
     "event_id" SERIAL NOT NULL,
     "website_id" INTEGER NOT NULL,
     "session_id" INTEGER NOT NULL,
+    "configuration_uuid" VARCHAR(500) DEFAULT NULL,
     "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
     "url" VARCHAR(500) NOT NULL,
     "step" VARCHAR(500) DEFAULT NULL,
@@ -34,11 +37,17 @@ CREATE INDEX "event_session_id_idx" ON "event"("session_id");
 -- CreateIndex
 CREATE INDEX "event_website_id_idx" ON "event"("website_id");
 
+-- CreateIndex
+CREATE INDEX "event_configuration_uuid_idx" ON "event"("configuration_id");
+
 -- AddForeignKey
 ALTER TABLE "event" ADD CONSTRAINT "event_session_id_fkey" FOREIGN KEY ("session_id") REFERENCES "session"("session_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "event" ADD CONSTRAINT "event_website_id_fkey" FOREIGN KEY ("website_id") REFERENCES "website"("website_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "event" ADD CONSTRAINT "event_configuration_id_fkey" FOREIGN KEY ("configuration_uuid") REFERENCES "configuration"("configuration_uuid") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- CreateTable
 CREATE TABLE "event_data" (

@@ -3,30 +3,30 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model account {
-  id          Int       @id @default(autoincrement()) @map("user_id") @db.UnsignedInt
-  username    String    @unique() @db.VarChar(255)
+  id          Int       @id @default(autoincrement()) @map("user_id")
+  username    String    @unique @db.VarChar(255)
   password    String    @db.VarChar(60)
   isAdmin     Boolean   @default(false) @map("is_admin")
-  createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
-  updatedAt   DateTime? @default(now()) @map("updated_at") @db.Timestamp(0)
-  accountUuid String    @unique() @map("account_uuid") @db.VarChar(36)
+  createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime? @default(now()) @map("updated_at") @db.Timestamptz(6)
+  accountUuid String    @unique @map("account_uuid") @db.Uuid
   website     website[]
 
   @@index([accountUuid])
 }
 
 model subpages {
-  id          Int       @id @default(autoincrement()) @map("subpage_id") @db.UnsignedInt
-  websiteId   Int       @map("website_id") @db.UnsignedInt
-  url         String    @db.VarChar(500)
-  step        String    @db.VarChar(500)
-  screenshot  Bytes     @db.Blob
-  website     website   @relation(fields: [websiteId], references: [id])
+  id         Int        @id() @default(autoincrement()) @map("subpage_id")
+  websiteId  Int        @map("website_id")
+  url        String     @db.VarChar(500)
+  step       String     @db.VarChar(500)
+  screenshot Bytes      @db.ByteA
+  website    website    @relation(fields: [websiteId], references: [id])
 
   @@index([websiteId, url, step])
   @@index([websiteId, url])
@@ -34,28 +34,31 @@ model subpages {
 }
 
 model event {
-  id        Int        @id @default(autoincrement()) @map("event_id") @db.UnsignedInt
-  websiteId Int        @map("website_id") @db.UnsignedInt
-  sessionId Int        @map("session_id") @db.UnsignedInt
-  createdAt DateTime?  @default(now()) @map("created_at") @db.Timestamp(0)
+  id        Int        @id() @default(autoincrement()) @map("event_id")
+  websiteId Int        @map("website_id")
+  sessionId Int        @map("session_id")
+  configurationUuid String?  @map("configuration_uuid") @db.VarChar(500)
+  createdAt DateTime?  @default(now()) @map("created_at") @db.Timestamptz(6)
   url       String     @db.VarChar(500)
   step      String?    @db.VarChar(500)
   eventName String     @map("event_name") @db.VarChar(50)
   eventType String     @map("event_type") @db.VarChar(50)
-  eventUuid String     @unique() @map("event_uuid") @db.VarChar(36)
+  eventUuid String     @unique @map("event_uuid") @db.Uuid
   session   session    @relation(fields: [sessionId], references: [id])
   website   website    @relation(fields: [websiteId], references: [id])
+  configuration   configuration    @relation(fields: [configurationUuid], references: [configurationUuid])
   eventData eventData?
 
   @@index([createdAt])
   @@index([sessionId])
   @@index([websiteId])
+  @@index([configurationUuid])
   @@index([eventUuid])
 }
 
 model eventData {
-  id        Int   @id @default(autoincrement()) @map("event_data_id") @db.UnsignedInt
-  eventId   Int   @unique @map("event_id") @db.UnsignedInt
+  id        Int   @id @default(autoincrement()) @map("event_data_id")
+  eventId   Int   @unique @map("event_id")
   eventData Json  @map("event_data")
   event     event @relation(fields: [eventId], references: [id])
 
@@ -63,10 +66,10 @@ model eventData {
 }
 
 model pageview {
-  id        Int       @id @default(autoincrement()) @map("view_id") @db.UnsignedInt
-  websiteId Int       @map("website_id") @db.UnsignedInt
-  sessionId Int       @map("session_id") @db.UnsignedInt
-  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
+  id        Int       @id @default(autoincrement()) @map("view_id")
+  websiteId Int       @map("website_id")
+  sessionId Int       @map("session_id")
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
   url       String    @db.VarChar(500)
   from      String?   @db.VarChar(500)
   referrer  String?   @db.VarChar(500)
@@ -80,11 +83,29 @@ model pageview {
   @@index([websiteId, sessionId, createdAt])
 }
 
+model configuration {
+  id        Int       @id @default(autoincrement()) @map("configuration_id")
+  websiteId Int       @map("website_id")
+  sessionId Int       @map("session_id")
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  configurationUuid String?  @map("configuration_uuid") @db.VarChar(500)
+  isComplete     Boolean   @default(false) @map("isComplete")
+  session   session   @relation(fields: [sessionId], references: [id])
+  website   website   @relation(fields: [websiteId], references: [id])
+
+  @@index([createdAt])
+  @@index([configurationUuid])
+  @@index([sessionId])
+  @@index([websiteId, createdAt])
+  @@index([websiteId])
+  @@index([websiteId, sessionId, createdAt])
+}
+
 model session {
-  id          Int        @id @default(autoincrement()) @map("session_id") @db.UnsignedInt
-  sessionUuid String     @unique() @map("session_uuid") @db.VarChar(36)
-  websiteId   Int        @map("website_id") @db.UnsignedInt
-  createdAt   DateTime?  @default(now()) @map("created_at") @db.Timestamp(0)
+  id          Int        @id @default(autoincrement()) @map("session_id")
+  sessionUuid String     @unique @map("session_uuid") @db.Uuid
+  websiteId   Int        @map("website_id")
+  createdAt   DateTime?  @default(now()) @map("created_at") @db.Timestamptz(6)
   hostname    String?    @db.VarChar(100)
   browser     String?    @db.VarChar(20)
   os          String?    @db.VarChar(20)
@@ -92,8 +113,8 @@ model session {
   screen      String?    @db.VarChar(11)
   language    String?    @db.VarChar(35)
   country     String?    @db.Char(2)
-  website     website    @relation(fields: [websiteId], references: [id])
-  event       event[]
+  website     website?   @relation(fields: [websiteId], references: [id])
+  events      event[]
   pageview    pageview[]
 
   @@index([createdAt])
@@ -102,13 +123,13 @@ model session {
 }
 
 model website {
-  id          Int        @id @default(autoincrement()) @map("website_id") @db.UnsignedInt
-  websiteUuid String     @unique() @map("website_uuid") @db.VarChar(36)
-  userId      Int        @map("user_id") @db.UnsignedInt
+  id          Int        @id @default(autoincrement()) @map("website_id")
+  websiteUuid String     @unique @map("website_uuid") @db.Uuid
+  userId      Int        @map("user_id")
   name        String     @db.VarChar(100)
   domain      String?    @db.VarChar(500)
-  shareId     String?    @unique() @map("share_id") @db.VarChar(64)
-  createdAt   DateTime?  @default(now()) @map("created_at") @db.Timestamp(0)
+  shareId     String?    @unique @map("share_id") @db.VarChar(64)
+  createdAt   DateTime?  @default(now()) @map("created_at") @db.Timestamptz(6)
   account     account    @relation(fields: [userId], references: [id])
   event       event[]
   pageview    pageview[]

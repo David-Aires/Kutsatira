@@ -1,6 +1,5 @@
-import { EVENT_NAME_LENGTH, URL_LENGTH } from 'lib/constants';
-import { CLICKHOUSE, PRISMA, runQuery } from 'lib/db';
-import kafka from 'lib/kafka';
+import { EVENT_NAME_LENGTH, URL_LENGTH, REGEXCUT } from 'lib/constants';
+import { PRISMA, runQuery } from 'lib/db';
 import prisma from 'lib/prisma';
 import eventstore from 'lib/eventstore';
 import { jsonEvent } from '@eventstore/db-client';
@@ -8,7 +7,6 @@ import { jsonEvent } from '@eventstore/db-client';
 export async function saveEvent(...args) {
   return runQuery({
     [PRISMA]: () => eventStoreQuery(...args),
-    [CLICKHOUSE]: () => clickhouseQuery(...args),
   });
 }
 
@@ -34,10 +32,12 @@ async function eventStoreQuery(
   }
 
   if (url.startsWith('#')) data.url = data.url.substr(1, data.url.length - 1);
+  data.url.replace(REGEXCUT, '/[id]');
   if (data.eventName.includes(':')) {
     const split_name = data.eventName.split(':');
-    data.eventName = split_name[1];
-    data.step = split_name[0];
+    data.configId = split_name[0];
+    data.eventName = split_name[2];
+    data.step = split_name[1];
   }
 
   if (data.eventName.includes('void_')) {
@@ -49,7 +49,9 @@ async function eventStoreQuery(
     data: data,
   });
 
-  eventstore.client.appendToStream(url + '_' + eventName, event);
+  const currentdate = new Date();
+  const formatedDate = currentdate.getDate() + "/"+  (parseInt(currentdate.getMonth())    + 1)+ "/" + currentdate.getFullYear();
+  eventstore.client.appendToStream(websiteId + ':' + sessionId + '_' + formatedDate, event);
 
   await eventstore.client.enableProjection('EventDB');
 
@@ -67,11 +69,34 @@ async function relationalQuery(event) {
     url: event.data.body.url,
     eventName: event.data.body.eventName,
     eventType: event.data.body.eventType,
-    eventUuid: event.data.eventId,
+    eventUuid: event.data.eventId
   };
 
-  if (event.data.body.step) {
+
+  if(event.data.body.configId && event.data.body.step) {
     data.step = event.data.body.step;
+    await prisma.client.configuration.upsert({
+      where: {
+        configurationUuid: event.data.body.configId,
+      },
+      update: {},
+      create: {
+        websiteId: data.websiteId,
+        sessionId: data.sessionId,
+        configurationUuid: event.data.body.configId,
+      }
+    });
+    data.configurationUuid = event.data.body.configId
+    if(data.eventName == "thend") {
+      await prisma.client.configuration.update({
+        where: {
+          configurationUuid: event.data.body.configId
+        },
+        data: {
+          isComplete: true,
+        }
+      });
+    }
   }
 
   if (event.data.body.additional) {
@@ -85,25 +110,4 @@ async function relationalQuery(event) {
   return prisma.client.event.create({
     data,
   });
-}
-
-async function clickhouseQuery(
-  { websiteUuid: websiteId },
-  { session: { country, sessionUuid, ...sessionArgs }, eventUuid, url, eventName, eventData },
-) {
-  const { getDateFormat, sendMessage } = kafka;
-
-  const params = {
-    session_id: sessionUuid,
-    event_id: eventUuid,
-    website_id: websiteId,
-    created_at: getDateFormat(new Date()),
-    url: url?.substring(0, URL_LENGTH),
-    event_name: eventName?.substring(0, EVENT_NAME_LENGTH),
-    event_data: eventData ? JSON.stringify(eventData) : null,
-    ...sessionArgs,
-    country: country ? country : null,
-  };
-
-  await sendMessage(params, 'event');
 }

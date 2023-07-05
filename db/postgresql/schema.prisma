@@ -37,6 +37,7 @@ model event {
   id        Int        @id() @default(autoincrement()) @map("event_id")
   websiteId Int        @map("website_id")
   sessionId Int        @map("session_id")
+  configurationUuid String?  @map("configuration_Uuid") @db.VarChar(500)
   createdAt DateTime?  @default(now()) @map("created_at") @db.Timestamptz(6)
   url       String     @db.VarChar(500)
   step      String?    @db.VarChar(500)
@@ -45,11 +46,13 @@ model event {
   eventUuid String     @unique @map("event_uuid") @db.Uuid
   session   session    @relation(fields: [sessionId], references: [id])
   website   website    @relation(fields: [websiteId], references: [id])
+  configuration   configuration    @relation(fields: [configurationUuid], references: [configurationUuid])
   eventData eventData?
 
   @@index([createdAt])
   @@index([sessionId])
   @@index([websiteId])
+  @@index([configurationUuid])
   @@index([eventUuid])
 }
 
@@ -74,6 +77,24 @@ model pageview {
   website   website   @relation(fields: [websiteId], references: [id])
 
   @@index([createdAt])
+  @@index([sessionId])
+  @@index([websiteId, createdAt])
+  @@index([websiteId])
+  @@index([websiteId, sessionId, createdAt])
+}
+
+model configuration {
+  id        Int       @id @default(autoincrement()) @map("configuration_id")
+  websiteId Int       @map("website_id")
+  sessionId Int       @map("session_id")
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  configurationUuid String?  @map("configuration_uuid") @db.VarChar(500)
+  isComplete     Boolean   @default(false) @map("isComplete")
+  session   session   @relation(fields: [sessionId], references: [id])
+  website   website   @relation(fields: [websiteId], references: [id])
+
+  @@index([createdAt])
+  @@index([configurationUuid])
   @@index([sessionId])
   @@index([websiteId, createdAt])
   @@index([websiteId])

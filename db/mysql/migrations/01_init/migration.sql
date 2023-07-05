@@ -19,6 +19,7 @@ CREATE TABLE `event` (
     `event_id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
     `website_id` INTEGER UNSIGNED NOT NULL,
     `session_id` INTEGER UNSIGNED NOT NULL,
+    `configuration_uuid` VARCHAR(500) DEFAULT NULL,
     `created_at` TIMESTAMP(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
     `url` VARCHAR(500) NOT NULL,
     `step` VARCHAR(500) DEFAULT NULL,
@@ -30,6 +31,7 @@ CREATE TABLE `event` (
     INDEX `event_created_at_idx`(`created_at`),
     INDEX `event_session_id_idx`(`session_id`),
     INDEX `event_website_id_idx`(`website_id`),
+    INDEX `event_configuration_uuid_idx`(`configuration_uuid`),
     INDEX `event_event_uuid_idx`(`event_uuid`),
     PRIMARY KEY (`event_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -60,6 +62,24 @@ CREATE TABLE `pageview` (
     INDEX `pageview_website_id_idx`(`website_id`),
     INDEX `pageview_website_id_session_id_created_at_idx`(`website_id`, `session_id`, `created_at`),
     PRIMARY KEY (`view_id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `configuration` (
+    `configuration_id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+    `website_id` INTEGER UNSIGNED NOT NULL,
+    `session_id` INTEGER UNSIGNED NOT NULL,
+    `configuration_uuid` VARCHAR(500) NOT NULL,
+    `created_at` TIMESTAMP(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `isComplete` BOOLEAN NOT NULL DEFAULT false,
+
+    INDEX `configuration_created_at_idx`(`created_at`),
+    INDEX `configuration_session_id_idx`(`session_id`),
+    UNIQUE INDEX `configuration_session_uuid_idx`(`configuration_uuid`),
+    INDEX `configuration_website_id_created_at_idx`(`website_id`, `created_at`),
+    INDEX `configuration_website_id_idx`(`website_id`),
+    INDEX `configuration_website_id_session_id_created_at_idx`(`website_id`, `session_id`, `created_at`),
+    PRIMARY KEY (`configuration_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable

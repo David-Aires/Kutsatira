@@ -1,14 +1,17 @@
 -- DropForeignKey
 ALTER TABLE `event` DROP FOREIGN KEY `event_ibfk_1`;
 ALTER TABLE `event` DROP FOREIGN KEY `event_ibfk_2`;
+ALTER TABLE `event` DROP FOREIGN KEY `event_ibfk_3`;
 
 DROP INDEX `event_created_at_idx` ON `event`;
 DROP INDEX `event_session_id_idx` ON `event`;
 DROP INDEX `event_website_id_idx` ON `event`;
+DROP INDEX `event_configuration_uuid_idx` ON `event`;
 
 CREATE INDEX `event_old_created_at_idx` ON `event` (created_at);
 CREATE INDEX `event_old_session_id_idx` ON `event` (session_id);
 CREATE INDEX `event_old_website_id_idx` ON `event` (website_id);
+CREATE INDEX `event_old_configuration_uuid_idx` ON `event` (configuration_uuid);
 
 -- RenameTable
 RENAME TABLE `event` TO `_event_old`;
@@ -19,6 +22,7 @@ CREATE TABLE `event`
     `event_id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
     `website_id` INTEGER UNSIGNED NOT NULL,
     `session_id` INTEGER UNSIGNED NOT NULL,
+    `configuration_uuid` VARCHAR(500) DEFAULT NULL,
     `created_at` TIMESTAMP(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
     `url` VARCHAR(500) NOT NULL,
     `step` VARCHAR(500) DEFAULT NULL,
@@ -28,6 +32,7 @@ CREATE TABLE `event`
     INDEX `event_created_at_idx`(`created_at`),
     INDEX `event_session_id_idx`(`session_id`),
     INDEX `event_website_id_idx`(`website_id`),
+    INDEX `event_configuration_uuid_idx`(`configuration_id`),
     PRIMARY KEY (`event_id`)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -36,6 +41,9 @@ ALTER TABLE `event` ADD CONSTRAINT `event_ibfk_2` FOREIGN KEY (`session_id`) REF
 
 -- AddForeignKey
 ALTER TABLE `event` ADD CONSTRAINT `event_ibfk_1` FOREIGN KEY (`website_id`) REFERENCES `website`(`website_id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE `event` ADD CONSTRAINT `event_ibfk_3` FOREIGN KEY (`configuration_uuid`) REFERENCES `configuration`(`configuration_uuid`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 
 -- CreateTable
