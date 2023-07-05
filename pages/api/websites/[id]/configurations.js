@@ -58,7 +58,7 @@ export default async (req, res) => {
         end_at: endDate,
         timezone: tz,
         unit,
-        count: 'distinct pageview.',
+        count: 'distinct configuration.',
         filters: {
           url,
           os,
