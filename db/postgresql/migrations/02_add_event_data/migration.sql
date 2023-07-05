@@ -38,7 +38,7 @@ CREATE INDEX "event_session_id_idx" ON "event"("session_id");
 CREATE INDEX "event_website_id_idx" ON "event"("website_id");
 
 -- CreateIndex
-CREATE INDEX "event_configuration_uuid_idx" ON "event"("configuration_id");
+CREATE INDEX "event_configuration_uuid_idx" ON "event"("configuration_uuid");
 
 -- AddForeignKey
 ALTER TABLE "event" ADD CONSTRAINT "event_session_id_fkey" FOREIGN KEY ("session_id") REFERENCES "session"("session_id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -47,7 +47,7 @@ ALTER TABLE "event" ADD CONSTRAINT "event_session_id_fkey" FOREIGN KEY ("session
 ALTER TABLE "event" ADD CONSTRAINT "event_website_id_fkey" FOREIGN KEY ("website_id") REFERENCES "website"("website_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "event" ADD CONSTRAINT "event_configuration_id_fkey" FOREIGN KEY ("configuration_uuid") REFERENCES "configuration"("configuration_uuid") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "event" ADD CONSTRAINT "event_configuration_uuid_fkey" FOREIGN KEY ("configuration_uuid") REFERENCES "configuration"("configuration_uuid") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- CreateTable
 CREATE TABLE "event_data" (
