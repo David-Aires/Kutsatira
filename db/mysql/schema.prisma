@@ -46,7 +46,7 @@ model event {
   eventUuid String     @unique @map("event_uuid") @db.Uuid
   session   session    @relation(fields: [sessionId], references: [id])
   website   website    @relation(fields: [websiteId], references: [id])
-  configuration   configuration    @relation(fields: [configurationUuid], references: [configurationUuid])
+  configuration   configuration?    @relation(fields: [configurationUuid], references: [configurationUuid])
   eventData eventData?
 
   @@index([createdAt])
