@@ -19,15 +19,19 @@ CREATE TABLE `event` (
     `event_id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
     `website_id` INTEGER UNSIGNED NOT NULL,
     `session_id` INTEGER UNSIGNED NOT NULL,
+    `configuration_uuid` VARCHAR(500) DEFAULT NULL,
     `created_at` TIMESTAMP(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
     `url` VARCHAR(500) NOT NULL,
+    `step` VARCHAR(500) DEFAULT NULL,
     `event_name` VARCHAR(50) NOT NULL,
+    `event_type` VARCHAR(50) NOT NULL,
     `event_uuid` VARCHAR(36) NOT NULL,
 
     UNIQUE INDEX `event_event_uuid_key`(`event_uuid`),
     INDEX `event_created_at_idx`(`created_at`),
     INDEX `event_session_id_idx`(`session_id`),
     INDEX `event_website_id_idx`(`website_id`),
+    INDEX `event_configuration_uuid_idx`(`configuration_uuid`),
     INDEX `event_event_uuid_idx`(`event_uuid`),
     PRIMARY KEY (`event_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -61,6 +65,24 @@ CREATE TABLE `pageview` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `configuration` (
+    `configuration_id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+    `website_id` INTEGER UNSIGNED NOT NULL,
+    `session_id` INTEGER UNSIGNED NOT NULL,
+    `configuration_uuid` VARCHAR(500) NOT NULL,
+    `created_at` TIMESTAMP(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `is_complete` BOOLEAN NOT NULL DEFAULT false,
+
+    INDEX `configuration_created_at_idx`(`created_at`),
+    INDEX `configuration_session_id_idx`(`session_id`),
+    UNIQUE INDEX `configuration_session_uuid_idx`(`configuration_uuid`),
+    INDEX `configuration_website_id_created_at_idx`(`website_id`, `created_at`),
+    INDEX `configuration_website_id_idx`(`website_id`),
+    INDEX `configuration_website_id_session_id_created_at_idx`(`website_id`, `session_id`, `created_at`),
+    PRIMARY KEY (`configuration_id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `session` (
     `session_id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
     `session_uuid` VARCHAR(36) NOT NULL,
@@ -86,9 +108,11 @@ CREATE TABLE "subpages" (
     "subpage_id" INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
     "website_id" INTEGER UNSIGNED NOT NULL,
     "url" VARCHAR(500) NOT NULL,
+    "step" VARCHAR(500) DEFAULT NULL,
     "screenshot" BLOB DEFAULT NULL,
     INDEX `subpages_website_id_idx`(`website_id`),
     INDEX `subpages_website_id_url_idx`(`website_id`, `url`),
+    INDEX `subpages_website_id_url_step_idx`(`website_id`, `url`, `step`),
     PRIMARY KEY (`subpage_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -112,6 +136,7 @@ CREATE TABLE `website` (
 
 
 ALTER TABLE subpages ADD CONSTRAINT `subpages_screenshot_unique` UNIQUE KEY(`website_id`,`url`);
+ALTER TABLE subpages ADD CONSTRAINT `subpages_screenshot_unique_step` UNIQUE KEY(`website_id`,`url`, `step`);
 
 -- CreateAdminUser
-INSERT INTO account (username, password, is_admin, account_uuid) values ('admin', '$2b$10$BUli0c.muyCW1ErNJc3jL.vFRFtFJWrT8/GcR4A.sUdCznaXiqFXa', true, uuid());
+INSERT INTO account (username, password, is_admin, account_uuid) values ('admin', '$2a$10$60dp/YMUJ1MDR9lbQt7msOqEDZZN8LhuCSZCu8Yqwl.kKwa4BmVtq', true, uuid());
