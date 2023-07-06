@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useIntl, defineMessage } from 'react-intl';
 import FilterLink from 'components/common/FilterLink';
 import MetricsTable from './MetricsTable';
@@ -17,7 +17,7 @@ export default function PagesTable({ websiteId, showFilters, ...props }) {
   const title = url.split('/')[5];
 
   const renderLink = ({ x: step }) => {
-    return <FilterLink id="step" value={step} label={formatMessage(getDeviceMessage(step))}/>;
+    return <FilterLink id="step" value={step}/>;
   };
 
   return (
