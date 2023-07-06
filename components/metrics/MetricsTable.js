@@ -33,7 +33,7 @@ export default function MetricsTable({
   const {
     resolve,
     router,
-    query: { url, referrer, os, browser, device, country },
+    query: { url, referrer, os, browser, device, country, step },
   } = usePageQuery();
   const { formatMessage } = useIntl();
 
@@ -50,11 +50,12 @@ export default function MetricsTable({
         browser,
         device,
         country,
+        step
       },
       onDataLoad,
       delay: delay || DEFAULT_ANIMATION_DURATION,
     },
-    [type, modified, url, referrer, os, browser, device, country],
+    [type, modified, url, referrer, os, browser, device, country, step],
   );
 
   const filteredData = useMemo(() => {
