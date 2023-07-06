@@ -8,7 +8,6 @@ import FormLayout, {
   FormMessage,
   FormRow,
 } from 'components/layout/FormLayout';
-import { URL_REGEX } from 'lib/constants';
 import useApi from 'hooks/useApi';
 import useFetch from 'hooks/useFetch';
 import styles from './WebsiteEditForm.module.css';
@@ -21,9 +20,7 @@ const validate = ({ site }) => {
   const errors = {};
   if (!site) {
     errors.site = <FormattedMessage id="label.required" defaultMessage="Required" />;
-  } else if (!URL_REGEX.test(site)) {
-    errors.site = <FormattedMessage id="label.invalid-site" defaultMessage="Invalid site" />;
-  } 
+  }
   return errors;
 };
 
@@ -115,7 +112,6 @@ export default function WebsiteScreenshotForm({ values, onSave, onClose }) {
   }
 
   const handleSubmit = async values => {
-    console.log(values)
     const { ok, data } = await post(`/screenshot/${websiteId}/create`, {
         url: values.url,
         site: values.site,
