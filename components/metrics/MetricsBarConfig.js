@@ -43,13 +43,12 @@ export default function MetricsBar({ websiteId, className }) {
     setFormat(state => !state);
   }
 
-  const { pageviews, uniques, bounces, totaltime } = data || {};
-  const num = Math.min(data && uniques.value, data && bounces.value);
+  const { configurations, uniques, close} = data || {};
+  const num = Math.min(data && uniques.value, data && close.value);
   const diffs = data && {
-    pageviews: pageviews.value - pageviews.change,
+    configurations: configurations.value - configurations.change,
     uniques: uniques.value - uniques.change,
-    bounces: bounces.value - bounces.change,
-    totaltime: totaltime.value - totaltime.change,
+    close: close.value - close.change,
   };
 
   return (
@@ -60,8 +59,8 @@ export default function MetricsBar({ websiteId, className }) {
         <>
           <MetricCard
             label={<FormattedMessage id="metrics.configurations" defaultMessage="Configurations" />}
-            value={pageviews.value}
-            change={pageviews.change}
+            value={configurations.value}
+            change={configurations.change}
             format={formatFunc}
           />
           <MetricCard
@@ -71,37 +70,11 @@ export default function MetricsBar({ websiteId, className }) {
             format={formatFunc}
           />
           <MetricCard
-            label={<FormattedMessage id="metrics.bounce-rate" defaultMessage="Configuration rate" />}
-            value={uniques.value ? (num / uniques.value) * 100 : 0}
-            change={
-              uniques.value && uniques.change
-                ? (num / uniques.value) * 100 -
-                    (Math.min(diffs.uniques, diffs.bounces) / diffs.uniques) * 100 || 0
-                : 0
-            }
-            format={n => Number(n).toFixed(0) + '%'}
+            label={<FormattedMessage id="metrics.close" defaultMessage="Configuration close" />}
+            value={close.value}
+            change={close.change}
+            format={formatFunc}
             reverseColors
-          />
-          <MetricCard
-            label={
-              <FormattedMessage
-                id="metrics.average-config-time"
-                defaultMessage="Average configuration time"
-              />
-            }
-            value={
-              totaltime.value && pageviews.value
-                ? totaltime.value / (pageviews.value - bounces.value)
-                : 0
-            }
-            change={
-              totaltime.value && pageviews.value
-                ? (diffs.totaltime / (diffs.pageviews - diffs.bounces) -
-                    totaltime.value / (pageviews.value - bounces.value)) *
-                    -1 || 0
-                : 0
-            }
-            format={n => `${n < 0 ? '-' : ''}${formatShortTime(Math.abs(~~n), ['m', 's'], ' ')}`}
           />
         </>
       )}

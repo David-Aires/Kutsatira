@@ -75,19 +75,28 @@ async function relationalQuery(event) {
 
   if(event.data.body.configId && event.data.body.step) {
     data.step = event.data.body.step;
+    if(!data.eventName.includes("Thend")) {
       await prisma.client.configuration.upsert({
-      where: {
-        configurationUuid: event.data.body.configId,
-      },
-      update: {
-        isComplete: data.eventName.includes("thend")? true:false,
-      },
-      create: {
-        websiteId: data.websiteId,
-        sessionId: data.sessionId,
-        configurationUuid: event.data.body.configId,
-      }
-    });
+        where: {
+          configurationUuid: event.data.body.configId,
+        },
+        update: {},
+        create: {
+          websiteId: data.websiteId,
+          sessionId: data.sessionId,
+          configurationUuid: event.data.body.configId,
+        }
+      });
+    } else {
+      await prisma.client.configuration.update({
+        where: {
+          configurationUuid: event.data.body.configId,
+        },
+        data: {
+          isComplete: true,
+        }
+      });
+    }
     data.configurationUuid = event.data.body.configId
   }
 
