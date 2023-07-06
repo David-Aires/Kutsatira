@@ -25,8 +25,8 @@ export default function EventsChart({ websiteId, className, token }) {
         tz: timezone,
         url,
         event_name: eventName,
+        step,
         token,
-        step
       },
     },
     [modified, eventName],
