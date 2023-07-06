@@ -12,7 +12,7 @@ export default function EventsChart({ websiteId, className, token }) {
   const [{ startDate, endDate, unit, modified }] = useDateRange(websiteId);
   const [timezone] = useTimezone();
   const {
-    query: { url, eventName },
+    query: { url, eventName, step },
   } = usePageQuery();
 
   const { data, loading } = useFetch(
@@ -26,6 +26,7 @@ export default function EventsChart({ websiteId, className, token }) {
         url,
         event_name: eventName,
         token,
+        step
       },
     },
     [modified, eventName],
