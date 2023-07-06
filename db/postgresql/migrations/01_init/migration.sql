@@ -55,7 +55,7 @@ CREATE TABLE "configuration" (
     "website_id" INTEGER NOT NULL,
     "session_id" INTEGER NOT NULL,
     "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
-    "isComplete" BOOLEAN NOT NULL DEFAULT false,
+    "is_complete" BOOLEAN NOT NULL DEFAULT false,
     "configuration_uuid" VARCHAR(500) NOT NULL,
 
     PRIMARY KEY ("configuration_id")

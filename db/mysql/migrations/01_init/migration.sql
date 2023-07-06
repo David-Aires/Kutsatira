@@ -71,7 +71,7 @@ CREATE TABLE `configuration` (
     `session_id` INTEGER UNSIGNED NOT NULL,
     `configuration_uuid` VARCHAR(500) NOT NULL,
     `created_at` TIMESTAMP(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `isComplete` BOOLEAN NOT NULL DEFAULT false,
+    `is_complete` BOOLEAN NOT NULL DEFAULT false,
 
     INDEX `configuration_created_at_idx`(`created_at`),
     INDEX `configuration_session_id_idx`(`session_id`),

@@ -89,7 +89,7 @@ model configuration {
   sessionId Int       @map("session_id")
   createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
   configurationUuid String  @map("configuration_uuid") @db.VarChar(500) @unique
-  isComplete     Boolean   @default(false) @map("isComplete")
+  isComplete     Boolean   @default(false) @map("is_complete")
   session   session   @relation(fields: [sessionId], references: [id])
   website   website   @relation(fields: [websiteId], references: [id])
   event     event[]

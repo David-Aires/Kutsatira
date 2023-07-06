@@ -25,7 +25,7 @@ async function relationalQuery(websiteId, { start_at, end_at, filters = {} }) {
         select configuration.session_id,
           ${getDateQuery('configuration.created_at', 'hour')},
           count(*) c,
-          configuration.isComplete cp
+          configuration.is_complete cp
         from configuration
           join website 
             on configuration.website_id = website.website_id
