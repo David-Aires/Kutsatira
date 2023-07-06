@@ -27,7 +27,7 @@ export default function UpdateNotice() {
   }
 
   useEffect(() => {
-    if (!checked) {
+    if (!checked && checked) {
       checkVersion();
     }
   }, [checked]);
