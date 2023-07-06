@@ -16,6 +16,8 @@ export default async (req, res) => {
 
     const { id: websiteId } = req.query;
     const { url, site, step, token } = req.body;
+    let domain = (new URL(site));
+    domain = domain.hostname;
 
    
 
@@ -24,7 +26,8 @@ export default async (req, res) => {
     if(token) {
       const cookies = [{
         name: 'vitrum-auth',
-        value: token
+        value: token,
+        domain: domain,
       }];
       await page.setCookie(...cookies);
     }
