@@ -56,6 +56,7 @@ export default async (req, res) => {
       browser,
       device,
       country,
+      step
     } = req.query;
 
     const startDate = new Date(+start_at);

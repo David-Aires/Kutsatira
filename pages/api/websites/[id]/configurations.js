@@ -22,12 +22,7 @@ export default async (req, res) => {
       end_at,
       unit,
       tz,
-      url,
-      referrer,
-      os,
-      browser,
-      device,
-      country,
+      step
     } = req.query;
 
     const startDate = new Date(+start_at);
@@ -45,12 +40,7 @@ export default async (req, res) => {
         unit,
         count: '*',
         filters: {
-          url,
-          referrer,
-          os,
-          browser,
-          device,
-          country,
+          step
         },
       }),
       getConfigStats(websiteId, {
@@ -60,11 +50,7 @@ export default async (req, res) => {
         unit,
         count: 'distinct configuration.',
         filters: {
-          url,
-          os,
-          browser,
-          device,
-          country,
+          step
         },
       }),
     ]);
