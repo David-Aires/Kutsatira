@@ -70,7 +70,7 @@ export default async (req, res) => {
 
   const eventUuid = uuid();
 
-  if(!eventName.length < 1 || !session ) return badRequest(res);
+  if(!session && session.length < 1) return badRequest(res);
   if (type === 'pageview') {
     await savePageView(website, { session, url, from, referrer });
   } else if (type === 'event') {

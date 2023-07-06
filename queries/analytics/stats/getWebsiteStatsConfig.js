@@ -20,12 +20,12 @@ async function relationalQuery(websiteId, { start_at, end_at, filters = {} }) {
   return rawQuery(
     `select sum(t.c) as "configurations",
         count(distinct t.session_id) as "uniques",
-        sum(case when t.cp then 1 else 0 end) as "close"
+        sum(t.cp) as "close"
       from (
         select configuration.session_id,
           ${getDateQuery('configuration.created_at', 'hour')},
           count(*) c,
-          configuration.is_complete cp
+          sum(case when configuration.is_complete = true then 1 else 0 end) cp
         from configuration
           join website 
             on configuration.website_id = website.website_id
@@ -33,7 +33,7 @@ async function relationalQuery(websiteId, { start_at, end_at, filters = {} }) {
         where website.website_uuid = $1${toUuid()}
           and configuration.created_at between $2 and $3
           ${sessionQuery}
-        group by 1, 2, 4
+        group by 1, 2
      ) t`,
     params,
   );

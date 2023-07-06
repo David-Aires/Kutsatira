@@ -119,7 +119,7 @@ export default async (req, res) => {
         country: type !== 'country' ? country : undefined,
         event_url: type !== 'url' && table === 'event' ? url : undefined,
         query: type === 'query' && table !== 'event' ? true : undefined,
-        step: type !== 'step' && table !== 'event' ? step : undefined,
+        step: type !== 'step' && table !== 'pageview'? step : undefined,
       };
 
       const data = await getPageviewMetrics(websiteId, {
