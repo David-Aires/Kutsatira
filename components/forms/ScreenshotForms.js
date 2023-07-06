@@ -119,7 +119,8 @@ export default function WebsiteScreenshotForm({ values, onSave, onClose }) {
     const { ok, data } = await post(`/screenshot/${websiteId}/create`, {
         url: values.url,
         site: values.site,
-        step: (values.step && stepsValues?values.step:null)
+        step: (values.step && stepsValues?values.step:null),
+        token: values.token,
     });
 
     if (ok) {
@@ -154,6 +155,16 @@ export default function WebsiteScreenshotForm({ values, onSave, onClose }) {
                   autoCorrect="off"
                 />
                 <FormError name="site" />
+              </div>
+              <div>
+                <Field
+                  name="token"
+                  type="text"
+                  placeholder="auth"
+                  spellCheck="false"
+                  autoCapitalize="off"
+                  autoCorrect="off"
+                />
               </div>
             </FormRow>
             <PagesDropDown websites={websites}/>

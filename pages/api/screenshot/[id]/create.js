@@ -15,10 +15,19 @@ export default async (req, res) => {
     }
 
     const { id: websiteId } = req.query;
-    const { url, site, step } = req.body;
+    const { url, site, step, token } = req.body;
+
+   
 
     const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']});
     const page = await browser.newPage();
+    if(token) {
+      const cookies = [{
+        name: 'vitrum-auth',
+        value: token
+      }];
+      await page.setCookie(...cookies);
+    }
     await page.goto(site);
     const image = await page.screenshot({fullPage : true});
 
