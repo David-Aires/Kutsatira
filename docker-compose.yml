@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "3000"
     environment:
       DATABASE_URL: postgresql://kutsatira:kutsatira@db:5432/kutsatira
       DATABASE_TYPE: postgresql
@@ -15,6 +15,15 @@ services:
     depends_on:
       - db
       - eventstore
+    networks:
+      - web
+      - default
+    labels:
+      - "traefik.docker.network=web"
+      - "traefik.enable=true"
+      - "traefik.basic.frontend.rule=Host:app.appkutsatira.cloud"
+      - "traefik.basic.port=3000"
+      - "traefik.basic.protocol=https"
     restart: always
 
   db:
@@ -24,10 +33,19 @@ services:
       POSTGRES_USER: kutsatira
       POSTGRES_PASSWORD: kutsatira
     ports:
-      - "5432:5432"
+      - "5432"
     volumes:
       - ./sql/schema.postgresql.sql:/docker-entrypoint-initdb.d/schema.postgresql.sql:ro
       - kutsatira-db-data:/var/lib/postgresql/data
+    networks:
+      - web
+      - default
+    labels:
+      - "traefik.docker.network=web"
+      - "traefik.enable=true"
+      - "traefik.basic.frontend.rule=Host:db.appkutsatira.cloud"
+      - "traefik.basic.port=5432"
+      - "traefik.basic.protocol=https"
     restart: always
   
   eventstore:
@@ -44,6 +62,15 @@ services:
     ports:
       - "1113:1113"
       - "2113:2113"
+    networks:
+      - web
+      - default
+    labels:
+      - "traefik.docker.network=web"
+      - "traefik.enable=true"
+      - "traefik.basic.frontend.rule=Host:events.appkutsatira.cloud"
+      - "traefik.basic.port=2113"
+      - "traefik.basic.protocol=https"
     volumes:
       - type: volume
         source: eventstore-volume-data
@@ -51,7 +78,31 @@ services:
       - type: volume
         source: eventstore-volume-logs
         target: /var/log/eventstore
+
+
+  traefik:
+    image: traefik:latest
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - web
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik.toml:/traefik.toml
+      - ./acme.json:/acme.json
+    container_name: traefik
+    depends_on:
+      - kutsatira
+
+networks:
+  web:
+    external: true
+
 volumes:
   kutsatira-db-data:
   eventstore-volume-data:
   eventstore-volume-logs:
+
+
