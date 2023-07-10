@@ -23,7 +23,6 @@ services:
       - "traefik.enable=true"
       - "traefik.basic.frontend.rule=Host:app.appkutsatira.cloud"
       - "traefik.basic.port=3000"
-      - "traefik.basic.protocol=https"
     restart: always
 
   db:
@@ -45,7 +44,6 @@ services:
       - "traefik.enable=true"
       - "traefik.basic.frontend.rule=Host:db.appkutsatira.cloud"
       - "traefik.basic.port=5432"
-      - "traefik.basic.protocol=https"
     restart: always
   
   eventstore:
@@ -70,7 +68,6 @@ services:
       - "traefik.enable=true"
       - "traefik.basic.frontend.rule=Host:events.appkutsatira.cloud"
       - "traefik.basic.port=2113"
-      - "traefik.basic.protocol=https"
     volumes:
       - type: volume
         source: eventstore-volume-data
